@@ -557,9 +557,9 @@ width: 199px;
     font-size: 14px;
     margin: 0px 4px;
     cursor: pointer;
-    border-radius: 0px;
+    border-radius: 4px;
     transition: background-color 0.3s ease;
-    transform: translate(0px, 5px);
+    transform: translate(0px, 3px);
     pointer-events: auto;
 }
 

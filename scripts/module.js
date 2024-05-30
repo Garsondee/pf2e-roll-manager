@@ -52,7 +52,7 @@ function createAndAppendDiceButton() {
     }
 }
 
-// Hook into the rendering of any Application
+
 Hooks.on("renderApplication", (app, html, data) => {
     // Find all inline check elements with the 'with-repost' class
     html.find("a.inline-check.with-repost").each(function() {
@@ -82,7 +82,6 @@ Hooks.on("renderApplication", (app, html, data) => {
     });
 });
 
-
 function handleDiceButtonClick(preSelectedSkills = [], preSelectedDC = null) {
     const selectedTokens = canvas.tokens.controlled.map(token => token.actor);
     if (!game.user.isGM) {
@@ -100,6 +99,11 @@ function handleDiceButtonClick(preSelectedSkills = [], preSelectedDC = null) {
 }
 
 function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = [], preSelectedSkills = [], preSelectedDC = null) {
+    // Ensure preSelectedSkills is an array
+    if (!Array.isArray(preSelectedSkills)) {
+        preSelectedSkills = [];
+    }
+
     // Fetch users and their characters, excluding the GM
     const users = game.users.contents.filter(user => !user.isGM);
     let characterSelection = '<div class="character-selection-grid">';
@@ -314,6 +318,7 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
     }, { width: 620, height: 860 }).render(true);
 }
 
+
 Hooks.once('ready', () => {
     console.log(`PF2E DICE ROLL MANAGER: Dice button is ready`);
     createAndAppendDiceButton();
@@ -342,6 +347,9 @@ function processSocketData(data) {
         removeCharacterBoxesAndOverlay();
     } else if (data.type === 'removeRollText') {
         removeRollText();
+    } else if (data.type === 'addRollResult') {
+        // Add the roll result to ResultsManager
+        resultsManager.addResult(data.result);
     }
     // Add your custom logic here to handle the data
     // For example, you might want to update the UI or perform some action based on the data
@@ -350,6 +358,7 @@ function processSocketData(data) {
         refreshDialogContent(data.dialogId, data.newContent);
     }
 }
+
 // Function to remove the roll text
 function removeRollText() {
     const heading = document.querySelector('#character-box-container h1');
@@ -518,24 +527,28 @@ function getSkillModifier(character, skillKey) {
     return totalModifier;
 }
 
-// Class to manage the results of the rolls
+// Modify ResultsManager to store result objects
 class ResultsManager {
     constructor() {
         this.results = [];
     }
-    // Add a result to the results array
+
     addResult(result) {
         this.results.push(result);
     }
-    // Clear all results
+
     clearResults() {
         this.results = [];
     }
-    // Get all results
-    getResults() {
-        return this.results;
+
+    getResultsSummary() {
+        return this.results.map(result => {
+            return `${result.character}: ${result.skill} - ${result.outcome}`;
+        }).join('\n\n'); // Separate each result with two newline characters for clearer separation
     }
 }
+
+// Instantiate ResultsManager
 const resultsManager = new ResultsManager();
 
 function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlindGM) {
@@ -554,6 +567,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     setTimeout(() => {
         overlay.classList.add('visible');
     }, 50);
+
     // Create a container for the character boxes
     const container = document.createElement('div');
     container.id = 'character-box-container';
@@ -566,6 +580,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     container.style.flexDirection = 'column';
     container.style.alignItems = 'center';
     container.style.zIndex = '99';
+
     // Create and style the heading element
     const heading = document.createElement('h1');
     let formattedSkills;
@@ -588,6 +603,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     heading.style.marginBottom = '20px';
     container.style.zIndex = '99';
     container.appendChild(heading);
+
     // Create a flex container for the character boxes
     const boxesContainer = document.createElement('div');
     boxesContainer.style.display = 'flex';
@@ -595,6 +611,8 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     boxesContainer.style.justifyContent = 'center';
     container.appendChild(boxesContainer);
     let characterBoxes = [];
+    let resultsSummary = [];
+
     selectedCharacters.forEach((character, index) => {
         const box = document.createElement('div');
         box.className = 'character-box fade-in';
@@ -605,6 +623,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         box.style.border = '1px solid black';
         box.style.borderRadius = '10px';
         box.style.textAlign = 'center';
+
         // Create and style the heading for the character name
         const characterNameHeading = document.createElement('h2');
         characterNameHeading.textContent = character.name;
@@ -612,6 +631,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         characterNameHeading.style.fontSize = '1.7em';
         characterNameHeading.style.marginBottom = '10px';
         box.appendChild(characterNameHeading);
+
         // Create and append the token image
         const tokenImage = document.createElement('img');
         tokenImage.src = character.prototypeToken.texture.src;
@@ -624,14 +644,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         tokenImage.style.padding = "10px";
         container.style.zIndex = '502';
         box.appendChild(tokenImage);
-        // // Create and style the user name element
-        // const userName = document.createElement('p');
-        // userName.textContent = `User: ${character.userName}`;
-        // userName.style.fontFamily = 'Arial, sans-serif';
-        // userName.style.fontSize = '1.2em';
-        // userName.style.marginTop = '10px';
-        // userName.style.color = '#555';
-        // box.appendChild(userName);
+
         // Create and append the skill selection dropdown
         const skillSelect = document.createElement('select');
         skillsToRoll.forEach(skill => {
@@ -645,18 +658,21 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
             }
         });
         box.appendChild(skillSelect);
+
         // Create and append the roll button
         const rollButton = document.createElement('button');
         rollButton.textContent = 'Roll';
         rollButton.style.display = 'block';
         rollButton.style.margin = '10px auto';
         box.appendChild(rollButton);
+
         // Create and append the new "Roll Blind GM" button
         const rollBlindButton = document.createElement('button');
         rollBlindButton.textContent = 'Roll Blind GM';
         rollBlindButton.style.display = 'block';
         rollBlindButton.style.margin = '10px auto';
         box.appendChild(rollBlindButton);
+
         // Create and append the result area
         const resultArea = document.createElement('div');
         resultArea.className = 'result-area';
@@ -666,6 +682,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         resultArea.style.border = '1px solid #ccc';
         resultArea.style.padding = '5px';
         box.appendChild(resultArea);
+
         // Create and append the indicator area
         const indicatorArea = document.createElement('div');
         indicatorArea.className = 'indicator-area';
@@ -673,9 +690,11 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         box.appendChild(indicatorArea);
         boxesContainer.appendChild(box);
         characterBoxes.push({ box, rolled: false });
+
         setTimeout(() => {
             box.classList.add('visible');
         }, 500 + index * 200);
+
         // Add event listener for the roll button
         rollButton.addEventListener('click', async () => {
             const selectedSkill = skillSelect.value;
@@ -713,13 +732,17 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
                             break;
                     }
                     indicatorArea.appendChild(indicator);
+                    resultsSummary.push(`${character.name}: ${selectedSkill} - ${indicator.textContent}`);
                     characterBoxes.find(item => item.box === box).rolled = true;
                     if (characterBoxes.every(item => item.rolled)) {
                         // Your existing code for removing character boxes and overlay...
                     }
                 }
             }, 100);
+            resultsManager.addResult({ character: character.name, skill: selectedSkill, outcome: indicator.textContent });
+
         });
+
         // Add event listener for the "Roll Blind GM" button
         rollBlindButton.addEventListener('click', async () => {
             const selectedSkill = skillSelect.value;
@@ -738,6 +761,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
                 const indicator = document.createElement('span');
                 indicator.textContent = "???";
                 indicatorArea.appendChild(indicator);
+                resultsSummary.push(`${character.name}: ${selectedSkill} - ???`);
                 characterBoxes.find(item => item.box === box).rolled = true;
                 if (characterBoxes.every(item => item.rolled)) {
                     game.socket.emit(namespace, { type: 'removeCharacterBoxesAndOverlay' });
@@ -770,18 +794,60 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
                     }, 5000);
                 }
             }
+            resultsManager.addResult({ character: character.name, skill: selectedSkill, outcome: "???" });
+
         });
     });
+
     const exitButton = document.createElement('button');
     exitButton.textContent = 'Exit';
     exitButton.className = 'exit-button';
     exitButton.style.display = 'block';
     exitButton.style.width = '90px';
     exitButton.style.margin = '20px auto';
+    exitButton.style.zIndex = '9999';
+
     exitButton.addEventListener('click', () => {
+        // Remove character boxes and overlay
         removeCharacterBoxesAndOverlay();
         removeRollText();
+
+        // Check if the current user is a GM and has GM level permissions
+        const gmUser = game.user;
+        if (gmUser && gmUser.isGM && gmUser.role >= CONST.USER_ROLES.GAMEMASTER) {
+            // Send results summary to GM
+            const resultSummaries = [];
+            const characterBoxes = document.querySelectorAll('.character-box');
+            characterBoxes.forEach(characterBox => {
+                const characterName = characterBox.querySelector('h2').textContent;
+                const resultArea = characterBox.querySelector('.result-area');
+                const skillOrSaveKey = characterBox.querySelector('select').value;
+                const indicatorArea = characterBox.querySelector('.indicator-area');
+                const indicator = indicatorArea.textContent.trim();
+                let degreeOfSuccess;
+                if (indicator.startsWith('✅ Critical Success ✅')) {
+                    degreeOfSuccess = "Critical Success";
+                } else if (indicator.startsWith('Success ✅')) {
+                    degreeOfSuccess = "Success";
+                } else if (indicator.startsWith('Failure ❌')) {
+                    degreeOfSuccess = "Failure";
+                } else if (indicator.startsWith('❌ Critical Failure ❌')) {
+                    degreeOfSuccess = "Critical Failure";
+                } else {
+                    degreeOfSuccess = "Unknown";
+                }
+                resultSummaries.push(`${characterName} - ${skillOrSaveKey}: ${indicator}`);
+            });
+
+            const summaryText = resultSummaries.join("<br>");
+            ChatMessage.create({
+                user: game.user._id,
+                content: summaryText,
+                whisper: [gmUser._id]
+            });
+        }
     });
+
     container.appendChild(exitButton);
     document.body.appendChild(container);
 }
@@ -789,7 +855,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
 // Function to update the character box with the roll result
 function refreshCharacterBoxWithRollResult(data) {
     const { actorId, skillOrSaveKey, dc, result } = data;
-    const { degreeOfSuccess, total, diceResults, isBlindGM, isSecret } = result;
+    const { degreeOfSuccess, total, diceResults, isBlindGM, isSecret, isRolling } = result;
     const characterBox = document.querySelector(`.character-box[data-actor-id="${actorId}"]`);
     if (!characterBox) {
         console.warn(`Character box for actor ID ${actorId} not found.`);
@@ -799,6 +865,11 @@ function refreshCharacterBoxWithRollResult(data) {
     const indicatorArea = characterBox.querySelector('.indicator-area');
     // Clear previous indicator
     indicatorArea.innerHTML = '';
+    // Display rolling message if rolling
+    if (isRolling) {
+        resultArea.textContent = 'Result: Rolling...';
+        return;
+    }
     // Delay before updating result and indicator areas
     setTimeout(() => {
         if ((isBlindGM && !game.user.isGM) || isSecret) {
@@ -894,6 +965,17 @@ async function performFlatCheck(actor, dc, isBlindGM) {
 }
 // Function to perform a skill or save check roll
 async function performSkillOrSaveCheck(skillOrSaveKey, actor, dc, isBlindGM) {
+    // Broadcast the initial "Rolling..." message to all users
+    game.socket.emit(namespace, {
+        type: 'updateRollResult',
+        actorId: actor.id,
+        skillOrSaveKey,
+        dc,
+        result: {
+            isRolling: true // Indicate that the roll is in progress
+        }
+    });
+
     if (skillOrSaveKey === 'Flat Check') {
         return performFlatCheck(actor, dc, isBlindGM);
     }
