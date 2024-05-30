@@ -1,13 +1,13 @@
 {
-  "id": "module",
-  "title": "New Module",
+  "id": "pf2e-roll-manager",
+  "title": "Pathfinder 2E Roll Manager",
   "description": "",
   "version": "#{VERSION}#",
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
-    "minimum": 10,
-    "verified": 10,
+    "minimum": 11,
+    "verified": 11,
     "maximum": 11
   },
   "authors": [
@@ -47,5 +47,6 @@
       "type": "icon",
       "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4"
     }
-  ]
+  ],
+  "socket": true
 }

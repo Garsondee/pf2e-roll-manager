@@ -1,0 +1,30 @@
+<style>
+    .player-skill-check-dialog .skill-check-grid {
+
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    .player-skill-check-dialog .player-column {
+        padding: 10px;
+        text-align: center;
+    }
+    .player-skill-check-dialog .player-column img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 5px;
+    }
+</style>
+<div class="skill-check-grid player-skill-check-dialog">
+    {{#each players}}
+    <div class="player-column">
+        <img src="{{img}}" alt="Character: {{name}}">
+        <div class="form-group player-check" data-user-id="{{id}}">
+            <p>Character: {{name}}</p>
+            <p>Skill Check: {{../skill}} (DC {{../dc}})</p>
+            <button type="button" class="roll-button" data-user-id="{{id}}" data-skill="{{../skill}}" data-dc="{{../dc}}">Roll</button>
+            <div class="result" data-user-id="{{id}}"></div>
+        </div>
+    </div>
+    {{/each}}
+</div>
