@@ -1,12 +1,16 @@
 const namespace = 'module.pf2e-roll-manager';
 // Hooks
-
 // Shared functions and variables
 const skillsAndSaves = [
     'Perception', 'Acrobatics', 'Arcana', 'Athletics', 'Crafting', 'Deception', 'Diplomacy', 'Intimidation', 'Medicine', 'Nature', 'Occultism', 'Performance', 'Religion', 'Society', 'Stealth', 'Survival', 'Thievery', 'Fortitude Save', 'Reflex Save', 'Will Save'
 ];
-
-
+/**
+ * Returns the color for a slider based on the difference between two values.
+ *
+ * @param {number} dc - The current value of the slider.
+ * @param {number} levelBasedDC - The reference value for the slider.
+ * @returns {string} The color code for the slider.
+ */
 function getSliderColor(dc, levelBasedDC) {
     const diff = dc - levelBasedDC;
     if (diff <= -10) {
@@ -20,7 +24,13 @@ function getSliderColor(dc, levelBasedDC) {
         return `rgb(${red}, ${green}, 0)`; // Green to Red
     }
 }
-
+/**
+ * Toggles a checkbox and adds or removes the 'selected' class from a button.
+ *
+ * @param {string} characterId - The id of the character element.
+ *
+ * @return {undefined}
+ */
 function toggleCheckbox(characterId) {
     const checkbox = document.getElementById(`checkbox-${characterId}`);
     const button = document.getElementById(`button-${characterId}`);
@@ -29,8 +39,6 @@ function toggleCheckbox(characterId) {
         button.classList.toggle('selected', checkbox.checked);
     }
 }
-
-
 // Function to create and append the green dice button to the sidebar
 function createAndAppendDiceButton() {
     if (document.querySelector('.dice-button')) return;
@@ -51,29 +59,21 @@ function createAndAppendDiceButton() {
         console.error('Dice Button | Sidebar not found.');
     }
 }
-
-
 Hooks.on("renderApplication", (app, html, data) => {
     // Find all inline check elements with the 'with-repost' class
     html.find("a.inline-check.with-repost").each(function() {
         const skillCheckElement = $(this);
-
         // Create the button element
         const button = $(`<button class="inline-dc-extra-skillbutton"></button>`);
-
         // Create the icon element with the new CSS class
         const icon = $('<i class="fas fa-dice-d20 no-click-through"></i>');
-
         // Append the icon to the button
         button.append(icon);
-
         // Append the button to the skill check element
         skillCheckElement.append(button);
-
         // Extract the skill type and DC from the inline check button
         const skillType = skillCheckElement.attr('data-pf2-check');
         const dc = parseInt(skillCheckElement.attr('data-pf2-dc'), 10);
-
         // Add click event listener to the button
         button.on("click", function() {
             const preSelectedSkills = skillType ? [skillType.charAt(0).toUpperCase() + skillType.slice(1)] : [];
@@ -81,34 +81,36 @@ Hooks.on("renderApplication", (app, html, data) => {
         });
     });
 });
-
 function handleDiceButtonClick(preSelectedSkills = [], preSelectedDC = null) {
     const selectedTokens = canvas.tokens.controlled.map(token => token.actor);
     if (!game.user.isGM) {
         ui.notifications.warn("Only the GM can use this button.");
         return;
     }
-
     // Fetch all character IDs
     const allCharacterIds = game.actors.contents
         .filter(actor => actor.type === 'character' && actor.hasPlayerOwner)
         .map(actor => actor.id);
-
     // Render the dialog with all characters pre-selected
     renderRollManagerDialog(selectedTokens, allCharacterIds, preSelectedSkills, preSelectedDC);
 }
-
+/**
+ * Renders the Roll Manager Dialog
+ *
+ * @param {Array} selectedTokens - Array of selected tokens
+ * @param {Array} preSelectedCharacterIds - Array of pre-selected character ids
+ * @param {Array} preSelectedSkills - Array of pre-selected skills
+ * @param {Number} preSelectedDC - Pre-selected DC
+ */
 function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = [], preSelectedSkills = [], preSelectedDC = null) {
     // Ensure preSelectedSkills is an array
     if (!Array.isArray(preSelectedSkills)) {
         preSelectedSkills = [];
     }
-
     // Fetch users and their characters, excluding the GM
     const users = game.users.contents.filter(user => !user.isGM);
     let characterSelection = '<div class="character-selection-grid">';
     let characterLevels = [];
-
     // Iterate over each user to find their characters
     users.forEach(user => {
         const characters = game.actors.contents.filter(actor => {
@@ -135,12 +137,10 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
         }
     });
     characterSelection += '</div>';
-
     // Calculate the average level, ignoring outliers
     const averageLevel = computeAverageCharacterLevel(characterLevels);
     const levelBasedDC = 15 + (averageLevel - 1) * 2;
     const initialDC = preSelectedDC !== null ? preSelectedDC : levelBasedDC;
-
     // Create the dialog content for skill/save selection and DC adjustment
     const dialogContent = `
     <form>
@@ -197,7 +197,6 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
       <div><hr></div>
     </form>
   `;
-
     new Dialog({
         title: 'The PF2E Roll Manager',
         content: dialogContent,
@@ -210,19 +209,16 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
                     const dc = parseInt(html.find('[name="dc"]').val(), 10);
                     const isBlindGM = html.find('[name="blindGM"]').is(':checked'); // Get the value of the blind GM checkbox
                     const selectedCharacterIds = html.find('[name="character"]:checked').map((_, el) => el.value).get();
-
                     if (selectedSkills.length === 0) {
                         ui.notifications.warn("Please select at least one skill or save to roll.");
                         renderRollManagerDialog(selectedTokens, preSelectedCharacterIds, preSelectedSkills, preSelectedDC); // Reopen the dialog
                         return false; // Prevent the dialog from closing
                     }
-
                     if (selectedCharacterIds.length === 0) {
                         ui.notifications.warn("Please select at least one character to roll.");
                         renderRollManagerDialog(selectedTokens, preSelectedCharacterIds, preSelectedSkills, preSelectedDC); // Reopen the dialog
                         return false; // Prevent the dialog from closing
                     }
-
                     console.log(`Rolling ${selectedSkills.join(', ')} against DC ${dc} for characters: ${selectedCharacterIds.join(', ')}`);
                     const selectedCharacters = selectedCharacterIds.map(id => game.actors.get(id));
                     console.log('Selected Characters:', selectedCharacters);
@@ -236,13 +232,11 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
                 callback: (html) => {
                     const dc = parseInt(html.find('[name="dc"]').val(), 10);
                     const selectedCharacterIds = html.find('[name="character"]:checked').map((_, el) => el.value).get();
-
                     if (selectedCharacterIds.length === 0) {
                         ui.notifications.warn("Please select at least one character to roll.");
                         renderRollManagerDialog(selectedTokens, preSelectedCharacterIds, preSelectedSkills, preSelectedDC); // Reopen the dialog
                         return false; // Prevent the dialog from closing
                     }
-
                     console.log(`Performing Flat Check against DC ${dc} for characters: ${selectedCharacterIds.join(', ')}`);
                     const selectedCharacters = selectedCharacterIds.map(id => game.actors.get(id));
                     displayCharacterRollBoxes(selectedCharacters, ['Flat Check'], dc, false);
@@ -256,7 +250,6 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
         default: 'roll',
         render: (html) => {
             html.closest('.dialog').addClass('skill-app'); // Add the custom class here
-
             selectedTokens.forEach(tokenActor => {
                 const checkbox = html.find(`#checkbox-${tokenActor.id}`);
                 if (checkbox.length) {
@@ -267,7 +260,6 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
                     }
                 }
             });
-
             const dcSlider = html.find('#dc-slider');
             const dcSliderValue = html.find('#dc-slider-value');
             dcSlider.on('input', function () {
@@ -277,7 +269,6 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
                 dcSliderValue.text(this.value);
                 html.find('#dc-input').val(this.value);
             });
-
             const dcInput = html.find('#dc-input');
             dcInput.on('input', function () {
                 const newDC = Math.max(1, Math.min(60, parseInt(this.value, 10)));
@@ -286,16 +277,13 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
                 dcSlider.val(newDC);
                 dcSliderValue.text(newDC);
             });
-
             html.find('.skill-button').on('click', function () {
                 $(this).toggleClass('selected');
             });
-
             html.find('.character-button').on('click', function () {
                 const characterId = $(this).data('character-id');
                 toggleCheckbox(characterId);
             });
-
             html.find('.dc-adjustment').on('click', function () {
                 const adjustValue = parseInt($(this).data('adjust'), 10);
                 const newDC = Math.max(1, Math.min(60, parseInt(dcSlider.val(), 10) + adjustValue));
@@ -305,7 +293,6 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
                 dcSliderValue.text(newDC);
                 dcInput.val(newDC);
             });
-
             html.find('.standard-dc').on('click', function () {
                 const standardDC = parseInt($(this).data('dc'), 10);
                 const color = getSliderColor(standardDC, levelBasedDC);
@@ -317,8 +304,6 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
         }
     }, { width: 620, height: 860 }).render(true);
 }
-
-
 Hooks.once('ready', () => {
     console.log(`PF2E DICE ROLL MANAGER: Dice button is ready`);
     createAndAppendDiceButton();
@@ -327,7 +312,6 @@ Hooks.once('ready', () => {
     logUsersAndAssignedCharacters();
     saveFoundrySettings();
 });
-
 // Function to handle received socket data
 function processSocketData(data) {
     console.log('handleSocketData called with data:', data);
@@ -358,7 +342,6 @@ function processSocketData(data) {
         refreshDialogContent(data.dialogId, data.newContent);
     }
 }
-
 // Function to remove the roll text
 function removeRollText() {
     const heading = document.querySelector('#character-box-container h1');
@@ -486,7 +469,15 @@ function computeAverageCharacterLevel(levels) {
     const total = trimmedLevels.reduce((sum, level) => sum + level, 0);
     return Math.round(total / trimmedLevels.length);
 }
-// Function to create and show character boxes using Foundry's provided methods
+/**
+ * Broadcasts the creation event to all clients and generates character roll boxes for the GM.
+ *
+ * @param {Array} selectedCharacters - An array of selected characters.
+ * @param {Array} skillsToRoll - An array of skills to roll.
+ * @param {number} dc - The difficulty class.
+ * @param {boolean} isBlindGM - Indicates if the roll should be blind.
+ * @return {void}
+ */
 async function displayCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlindGM) {
     // Broadcast the creation event to all clients
     game.socket.emit(namespace, {
@@ -502,7 +493,6 @@ async function displayCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, i
 function getSkillModifier(character, skillKey) {
     let totalModifier = 0;
     let skill;
-
     // Check if the skillKey is a save, perception, or a regular skill
     if (['fortitude', 'reflex', 'will'].includes(skillKey)) {
         // Access the save skill
@@ -514,7 +504,6 @@ function getSkillModifier(character, skillKey) {
         // Access the regular skill
         skill = character.system.skills[skillKey];
     }
-
     // If the skill or save exists, sum up the modifiers
     if (skill && skill.modifiers) {
         // Sum up the modifiers if they exist
@@ -523,34 +512,27 @@ function getSkillModifier(character, skillKey) {
         // Use the totalModifier attribute if it exists or fallback to value
         totalModifier = skill.totalModifier || skill.value || 0;
     }
-
     return totalModifier;
 }
-
 // Modify ResultsManager to store result objects
 class ResultsManager {
     constructor() {
         this.results = [];
     }
-
     addResult(result) {
         this.results.push(result);
     }
-
     clearResults() {
         this.results = [];
     }
-
     getResultsSummary() {
         return this.results.map(result => {
             return `${result.character}: ${result.skill} - ${result.outcome}`;
         }).join('\n\n'); // Separate each result with two newline characters for clearer separation
     }
 }
-
 // Instantiate ResultsManager
 const resultsManager = new ResultsManager();
-
 function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlindGM) {
     // Create a dark overlay element
     const overlay = document.createElement('div');
@@ -567,7 +549,6 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     setTimeout(() => {
         overlay.classList.add('visible');
     }, 50);
-
     // Create a container for the character boxes
     const container = document.createElement('div');
     container.id = 'character-box-container';
@@ -580,11 +561,9 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     container.style.flexDirection = 'column';
     container.style.alignItems = 'center';
     container.style.zIndex = '99';
-
     // Create and style the heading element
     const heading = document.createElement('h1');
     let formattedSkills;
-
     if (skillsToRoll.length === 1) {
         formattedSkills = skillsToRoll[0];
     } else if (skillsToRoll.length === 2) {
@@ -594,7 +573,6 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     } else {
         formattedSkills = skillsToRoll.join(', '); // For more than 3 skills, if needed.
     }
-
     heading.textContent = `The GM would like you to attempt a roll: ${formattedSkills} - DC: ${dc}`;
     overlay.classList.add('non-interactive-overlay');
     heading.style.color = 'white';
@@ -603,7 +581,6 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     heading.style.marginBottom = '20px';
     container.style.zIndex = '99';
     container.appendChild(heading);
-
     // Create a flex container for the character boxes
     const boxesContainer = document.createElement('div');
     boxesContainer.style.display = 'flex';
@@ -612,9 +589,11 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     container.appendChild(boxesContainer);
     let characterBoxes = [];
     let resultsSummary = [];
-
     selectedCharacters.forEach((character, index) => {
         const box = document.createElement('div');
+
+
+
         box.className = 'character-box fade-in';
         box.dataset.actorId = character.id;
         box.style.margin = '10px';
@@ -623,7 +602,6 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         box.style.border = '1px solid black';
         box.style.borderRadius = '10px';
         box.style.textAlign = 'center';
-
         // Create and style the heading for the character name
         const characterNameHeading = document.createElement('h2');
         characterNameHeading.textContent = character.name;
@@ -631,7 +609,6 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         characterNameHeading.style.fontSize = '1.7em';
         characterNameHeading.style.marginBottom = '10px';
         box.appendChild(characterNameHeading);
-
         // Create and append the token image
         const tokenImage = document.createElement('img');
         tokenImage.src = character.prototypeToken.texture.src;
@@ -644,7 +621,6 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         tokenImage.style.padding = "10px";
         container.style.zIndex = '502';
         box.appendChild(tokenImage);
-
         // Create and append the skill selection dropdown
         const skillSelect = document.createElement('select');
         skillsToRoll.forEach(skill => {
@@ -658,21 +634,18 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
             }
         });
         box.appendChild(skillSelect);
-
         // Create and append the roll button
         const rollButton = document.createElement('button');
         rollButton.textContent = 'Roll';
         rollButton.style.display = 'block';
         rollButton.style.margin = '10px auto';
         box.appendChild(rollButton);
-
         // Create and append the new "Roll Blind GM" button
         const rollBlindButton = document.createElement('button');
         rollBlindButton.textContent = 'Roll Blind GM';
         rollBlindButton.style.display = 'block';
         rollBlindButton.style.margin = '10px auto';
         box.appendChild(rollBlindButton);
-
         // Create and append the result area
         const resultArea = document.createElement('div');
         resultArea.className = 'result-area';
@@ -682,7 +655,6 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         resultArea.style.border = '1px solid #ccc';
         resultArea.style.padding = '5px';
         box.appendChild(resultArea);
-
         // Create and append the indicator area
         const indicatorArea = document.createElement('div');
         indicatorArea.className = 'indicator-area';
@@ -690,11 +662,9 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
         box.appendChild(indicatorArea);
         boxesContainer.appendChild(box);
         characterBoxes.push({ box, rolled: false });
-
         setTimeout(() => {
             box.classList.add('visible');
         }, 500 + index * 200);
-
         // Add event listener for the roll button
         rollButton.addEventListener('click', async () => {
             const selectedSkill = skillSelect.value;
@@ -740,9 +710,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
                 }
             }, 100);
             resultsManager.addResult({ character: character.name, skill: selectedSkill, outcome: indicator.textContent });
-
         });
-
         // Add event listener for the "Roll Blind GM" button
         rollBlindButton.addEventListener('click', async () => {
             const selectedSkill = skillSelect.value;
@@ -795,10 +763,8 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
                 }
             }
             resultsManager.addResult({ character: character.name, skill: selectedSkill, outcome: "???" });
-
         });
     });
-
     const exitButton = document.createElement('button');
     exitButton.textContent = 'Exit';
     exitButton.className = 'exit-button';
@@ -806,12 +772,10 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
     exitButton.style.width = '90px';
     exitButton.style.margin = '20px auto';
     exitButton.style.zIndex = '9999';
-
     exitButton.addEventListener('click', () => {
         // Remove character boxes and overlay
         removeCharacterBoxesAndOverlay();
         removeRollText();
-
         // Check if the current user is a GM and has GM level permissions
         const gmUser = game.user;
         if (gmUser && gmUser.isGM && gmUser.role >= CONST.USER_ROLES.GAMEMASTER) {
@@ -838,7 +802,6 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
                 }
                 resultSummaries.push(`${characterName} - ${skillOrSaveKey}: ${indicator}`);
             });
-
             const summaryText = resultSummaries.join("<br>");
             ChatMessage.create({
                 user: game.user._id,
@@ -847,11 +810,9 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlin
             });
         }
     });
-
     container.appendChild(exitButton);
     document.body.appendChild(container);
 }
-
 // Function to update the character box with the roll result
 function refreshCharacterBoxWithRollResult(data) {
     const { actorId, skillOrSaveKey, dc, result } = data;
@@ -975,7 +936,6 @@ async function performSkillOrSaveCheck(skillOrSaveKey, actor, dc, isBlindGM) {
             isRolling: true // Indicate that the roll is in progress
         }
     });
-
     if (skillOrSaveKey === 'Flat Check') {
         return performFlatCheck(actor, dc, isBlindGM);
     }
@@ -1070,5 +1030,3 @@ async function performSkillOrSaveCheck(skillOrSaveKey, actor, dc, isBlindGM) {
         console.error('Error rolling check:', error);
     }
 }
-
-
