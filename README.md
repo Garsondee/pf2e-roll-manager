@@ -1,5 +1,14 @@
 # Pathfinder 2nd Edition - Roll Manager
 
+![Image 1](https://imgur.com/rNW0p5x.png)
+
+![Image 2](https://imgur.com/umz79gi.png)
+
+![Image 3](https://imgur.com/m1bKzdS.png)
+
+![Image 4](https://imgur.com/4GOvB2g.png)
+
+
 ## Introduction
 
 Welcome to the Pathfinder 2nd Edition - Roll Manager module for Foundry VTT! This module is designed to streamline the
