@@ -1204,3 +1204,5 @@ async function performSkillOrSaveCheck(skillOrSaveKey, actor, dc, isBlindGM) {
         console.error('Error rolling check:', error);
     }
 }
+
+//console
