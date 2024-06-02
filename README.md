@@ -34,9 +34,9 @@ flowing smoothly.
 
 To install the Pathfinder 2nd Edition - Roll Manager module, simply follow these steps:
 
-1. Download the module from [INSERT LINK].
+1. Download the module from the releases tab - you can use the JSON file to get Foundry to download the module.
 2. Unzip the downloaded file.
-3. Copy the folder named "pathfinder2e-roll-manager" into the "modules" folder of your Foundry VTT installation.
+3. Copy the folder named "pf2e-roll-manager" into the "modules" folder of your Foundry VTT installation.
 4. Launch Foundry VTT and activate the module in your Game Settings.
 
 ## Usage
