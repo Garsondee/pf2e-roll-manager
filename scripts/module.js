@@ -177,10 +177,12 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
     if (!Array.isArray(preSelectedSkills)) {
         preSelectedSkills = [];
     }
+
     // Fetch users and their characters, excluding the GM
     const users = game.users.contents.filter(user => !user.isGM);
     let characterSelection = '<div class="character-selection-grid">';
     let characterLevels = [];
+
     // Iterate over each user to find their characters
     users.forEach(user => {
         const characters = game.actors.contents.filter(actor => {
@@ -191,16 +193,16 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
             characters.forEach(character => {
                 const tokenTexture = character.prototypeToken.texture.src || '';
                 characterSelection += `
-          <div class="character-selection">
-            <input type="checkbox" id="checkbox-${character.id}" name="character" value="${character.id}" style="display: none;" ${preSelectedCharacterIds.includes(character.id) ? 'checked' : ''} />
-            <button class="character-button ${preSelectedCharacterIds.includes(character.id) ? 'selected' : ''}" id="button-${character.id}" data-character-id="${character.id}">
-              <div class="character-name">${character.name}</div>
-              <div class="character-token">
-                <img src="${tokenTexture}" alt="${character.name}" width="50" height="50" />
-              </div>
-            </button>
-          </div>
-        `;
+                    <div class="character-selection">
+                        <input type="checkbox" id="checkbox-${character.id}" name="character" value="${character.id}" style="display: none;" ${preSelectedCharacterIds.includes(character.id) ? 'checked' : ''} />
+                        <button class="character-button ${preSelectedCharacterIds.includes(character.id) ? 'selected' : ''}" id="button-${character.id}" data-character-id="${character.id}">
+                            <div class="character-name">${character.name}</div>
+                            <div class="character-token">
+                                <img src="${tokenTexture}" alt="${character.name}" width="50" height="50" />
+                            </div>
+                        </button>
+                    </div>
+                `;
                 characterLevels.push(character.system.details.level.value);
             });
             characterSelection += `</div>`;
@@ -215,60 +217,61 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
 
     // Create the dialog content for skill/save selection and DC adjustment
     const dialogContent = `
-    <form>
-      <!-- Skill/Save Selection Section -->
-      <div class="skill-form-group">
-        <div class="skill-save-selection flex-container">
-          <div class="skill-buttons-grid">
-            ${skillsAndSaves.map(skill => `
-              <button type="button" class="skill-button ${preSelectedSkills.includes(skill) ? 'selected' : ''}" data-skill="${skill}">${skill}</button>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-      <!-- DC Adjustment Section -->
-      <div class="skill-form-group">
-        <div><hr></div>
-        <div class="dc-slider-container slider-container">
-          <input type="range" id="dc-slider" name="dc" min="1" max="60" value="${initialDC}" />
-        </div>
-      </div>
-      <div><hr></div>
-      <div class="level-based-dc-buttons flex-container">
-        <button type="button" class="dc-adjustment" data-adjust="-10">V. Easy -10</button>
-        <button type="button" class="dc-adjustment" data-adjust="-5">Easier -5</button>
-        <button type="button" class="dc-adjustment" data-adjust="-2">Easy -2</button>
-        <input type="number" id="dc-input" name="dc" value="${initialDC}" min="1" max="60" class="dc-input" />
-        <button type="button" class="dc-adjustment" data-adjust="2">Hard +2</button>
-        <button type="button" class="dc-adjustment" data-adjust="5">Harder +5</button>
-        <button type="button" class="dc-adjustment" data-adjust="10">V. Hard +10</button>
-      </div>
-      <div><hr></div>
-      <div class="standard-dc-buttons flex-container">
-        <button type="button" class="standard-dc" data-dc="10">Untrained</button>
-        <button type="button" class="standard-dc" data-dc="15">Trained</button>
-        <button type="button" class="standard-dc" data-dc="20">Expert</button>
-        <button type="button" class="standard-dc" data-dc="30">Master</button>
-        <button type="button" class="standard-dc" data-dc="40">Legendary</button>
-        <button type="button" class="standard-dc" data-dc="50">Mythical</button>
-      </div>
-      <!-- Character Selection Section -->
-      <div class="skill-form-group">
-        <div><hr></div>
-        <div class="character-selection-grid flex-container">
-          ${characterSelection}
-        </div>
-      </div>
-      <div><hr></div>
-      <div class="kofi-donation">
-        <label> Want to support this module? Please consider a <a href="https://ko-fi.com/mythicamachina">donation</a> to help pay for development. </label>
-        <a href="https://ko-fi.com/mythicamachina">
-          <img src="modules/pf2e-roll-manager/img/kofilogo.png" alt="Ko-Fi Logo" style="height: 25px; border: none;" />
-        </a>
-      </div>
-      <div><hr></div>
-    </form>
-  `;
+        <form>
+            <!-- Skill/Save Selection Section -->
+            <div class="skill-form-group">
+                <div class="skill-save-selection flex-container">
+                    <div class="skill-buttons-grid">
+                        ${skillsAndSaves.map(skill => `
+                            <button type="button" class="skill-button ${preSelectedSkills.includes(skill) ? 'selected' : ''}" data-skill="${skill}">${skill}</button>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            <!-- DC Adjustment Section -->
+            <div class="skill-form-group">
+                <div><hr></div>
+                <div class="dc-slider-container slider-container">
+                    <input type="range" id="dc-slider" name="dc" min="1" max="60" value="${initialDC}" />
+                    <span id="dc-slider-value">${initialDC}</span>
+                </div>
+            </div>
+            <div><hr></div>
+            <div class="level-based-dc-buttons flex-container">
+                <button type="button" class="dc-adjustment" data-adjust="-10">V. Easy -10</button>
+                <button type="button" class="dc-adjustment" data-adjust="-5">Easier -5</button>
+                <button type="button" class="dc-adjustment" data-adjust="-2">Easy -2</button>
+                <input type="number" id="dc-input" name="dc-input" value="${initialDC}" min="1" max="60" class="dc-input" />
+                <button type="button" class="dc-adjustment" data-adjust="2">Hard +2</button>
+                <button type="button" class="dc-adjustment" data-adjust="5">Harder +5</button>
+                <button type="button" class="dc-adjustment" data-adjust="10">V. Hard +10</button>
+            </div>
+            <div><hr></div>
+            <div class="standard-dc-buttons flex-container">
+                <button type="button" class="standard-dc" data-dc="10">Untrained</button>
+                <button type="button" class="standard-dc" data-dc="15">Trained</button>
+                <button type="button" class="standard-dc" data-dc="20">Expert</button>
+                <button type="button" class="standard-dc" data-dc="30">Master</button>
+                <button type="button" class="standard-dc" data-dc="40">Legendary</button>
+                <button type="button" class="standard-dc" data-dc="50">Mythical</button>
+            </div>
+            <!-- Character Selection Section -->
+            <div class="skill-form-group">
+                <div><hr></div>
+                <div class="character-selection-grid flex-container">
+                    ${characterSelection}
+                </div>
+            </div>
+            <div><hr></div>
+            <div class="kofi-donation">
+                <label> Want to support this module? Please consider a <a href="https://ko-fi.com/mythicamachina">donation</a> to help pay for development. </label>
+                <a href="https://ko-fi.com/mythicamachina">
+                    <img src="modules/pf2e-roll-manager/img/kofilogo.png" alt="Ko-Fi Logo" style="height: 25px; border: none;" />
+                </a>
+            </div>
+            <div><hr></div>
+        </form>
+    `;
 
     new Dialog({
         title: 'The PF2E Roll Manager',
@@ -279,7 +282,7 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
                 label: 'Roll',
                 callback: (html) => {
                     const selectedSkills = html.find('.skill-button.selected').map((_, el) => el.dataset.skill).get();
-                    const dc = parseInt(html.find('[name="dc"]').val(), 10);
+                    const dc = parseInt(html.find('#dc-input').val(), 10);  // Get the updated DC value
                     const isBlindGM = html.find('[name="blindGM"]').is(':checked'); // Get the value of the blind GM checkbox
                     const selectedCharacterIds = html.find('[name="character"]:checked').map((_, el) => el.value).get();
                     if (selectedSkills.length === 0) {
@@ -303,7 +306,7 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
                 icon: '<i class="fas fa-dice-d20"></i>',
                 label: 'Flat Check',
                 callback: (html) => {
-                    const dc = parseInt(html.find('[name="dc"]').val(), 10);
+                    const dc = parseInt(html.find('#dc-input').val(), 10);  // Get the updated DC value
                     const selectedCharacterIds = html.find('[name="character"]:checked').map((_, el) => el.value).get();
                     if (selectedCharacterIds.length === 0) {
                         ui.notifications.warn("Please select at least one character to roll.");
@@ -586,9 +589,8 @@ async function checkCharacterOwnershipPermissions(character) {
 }
 
 
-function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, isBlindGM) {
-    const averageLevel = computeAverageCharacterLevel(levels);
-    const dc = calculateDC(averageLevel);    // Create a dark overlay element
+function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlindGM) {
+    // Create a dark overlay element
     const overlay = document.createElement('div');
     overlay.id = 'dark-overlay';
     overlay.classList.add('non-interactive-overlay');
@@ -603,6 +605,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
     setTimeout(() => {
         overlay.classList.add('visible');
     }, 50);
+
     // Create a container for the character boxes
     const container = document.createElement('div');
     container.id = 'character-box-container';
@@ -615,6 +618,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
     container.style.flexDirection = 'column';
     container.style.alignItems = 'center';
     container.style.zIndex = '99';
+
     // Create and style the heading element
     const heading = document.createElement('h1');
     let formattedSkills;
@@ -635,18 +639,19 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
     heading.style.marginBottom = '20px';
     container.style.zIndex = '99';
     container.appendChild(heading);
+
     // Create a flex container for the character boxes
     const boxesContainer = document.createElement('div');
     boxesContainer.style.display = 'flex';
     boxesContainer.style.flexWrap = 'wrap';
     boxesContainer.style.justifyContent = 'center';
     container.appendChild(boxesContainer);
+
     let characterBoxes = [];
     let resultsSummary = [];
+
     selectedCharacters.forEach((character, index) => {
         const box = document.createElement('div');
-
-
         box.className = 'character-box fade-in';
         box.dataset.actorId = character.id;
         box.style.margin = '10px';
@@ -655,6 +660,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
         box.style.border = '1px solid black';
         box.style.borderRadius = '10px';
         box.style.textAlign = 'center';
+
         // Create and style the heading for the character name
         const characterNameHeading = document.createElement('h2');
         characterNameHeading.textContent = character.name;
@@ -662,6 +668,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
         characterNameHeading.style.fontSize = '1.7em';
         characterNameHeading.style.marginBottom = '10px';
         box.appendChild(characterNameHeading);
+
         // Create and append the token image
         const tokenImage = document.createElement('img');
         tokenImage.src = character.prototypeToken.texture.src;
@@ -674,6 +681,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
         tokenImage.style.padding = "10px";
         container.style.zIndex = '502';
         box.appendChild(tokenImage);
+
         // Create and append the skill selection dropdown
         const skillSelect = document.createElement('select');
         skillsToRoll.forEach(skill => {
@@ -687,18 +695,21 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
             }
         });
         box.appendChild(skillSelect);
+
         // Create and append the roll button
         const rollButton = document.createElement('button');
         rollButton.textContent = 'Roll';
         rollButton.style.display = 'block';
         rollButton.style.margin = '10px auto';
         box.appendChild(rollButton);
+
         // Create and append the new "Roll Blind GM" button
         const rollBlindButton = document.createElement('button');
         rollBlindButton.textContent = 'Roll Blind GM';
         rollBlindButton.style.display = 'block';
         rollBlindButton.style.margin = '10px auto';
         box.appendChild(rollBlindButton);
+
         // Create and append the result area
         const resultArea = document.createElement('div');
         resultArea.className = 'result-area';
@@ -708,16 +719,19 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
         resultArea.style.border = '1px solid #ccc';
         resultArea.style.padding = '5px';
         box.appendChild(resultArea);
+
         // Create and append the indicator area
         const indicatorArea = document.createElement('div');
         indicatorArea.className = 'indicator-area';
         indicatorArea.style.marginTop = '5px';
         box.appendChild(indicatorArea);
+
         boxesContainer.appendChild(box);
         characterBoxes.push({box, rolled: false});
         setTimeout(() => {
             box.classList.add('visible');
         }, 500 + index * 200);
+
         // Add event listener for the roll button
         rollButton.addEventListener('click', async () => {
             const selectedSkill = skillSelect.value;
@@ -772,6 +786,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
                 }
             }, 100);
         });
+
         // Add event listener for the "Roll Blind GM" button
         rollBlindButton.addEventListener('click', async () => {
             const selectedSkill = skillSelect.value;
@@ -838,6 +853,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
             });
         });
     });
+
     const exitButton = document.createElement('button');
     exitButton.textContent = 'Exit';
     exitButton.className = 'exit-button';
@@ -885,6 +901,7 @@ function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, levels, is
     container.appendChild(exitButton);
     document.body.appendChild(container);
 }
+
 
 // Function to update the character box with the roll result
 function refreshCharacterBoxWithRollResult(data) {
