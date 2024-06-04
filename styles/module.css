@@ -28,14 +28,6 @@
     flex-wrap: wrap;
 }
 
-.form-group > label, .form-group-stacked > label {
-    font-weight: bold;
-    margin-bottom: 0.5em;
-    display: block;
-    font-size: 1.2em;
-    color: #333;
-    flex: 0.01;
-}
 
 /* Flexbox Layout */
 .flex-container {
@@ -583,4 +575,14 @@ width: 199px;
 .no-click-through {
     pointer-events: none;
     translate: 3px -4px;
+}
+
+
+.dc-input-box {
+    background-color: var(--dc-slider-color) !important;
+    color: #000000 !important;
+    width: 75px !important;
+    height: 36px !important;
+    text-align: center !important;
+    font-size: larger !important;
 }
