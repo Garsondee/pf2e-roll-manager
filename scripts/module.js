@@ -134,6 +134,7 @@ function toggleCheckbox(characterId) {
 }
 
 function createAndAppendDiceButton() {
+    if (!game.user.isGM) return;
     if (document.querySelector('.dice-button')) return;
     const button = document.createElement('button');
     button.className = 'dice-button';
