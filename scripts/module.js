@@ -205,6 +205,7 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
         content: dialogContent,
         buttons: {
             roll: createRollButton(preSelectedCharacterIds, preSelectedSkills, preSelectedDC, selectedTokens),
+            blindRoll: createRollButton(preSelectedCharacterIds, preSelectedSkills, preSelectedDC, selectedTokens, true),
             rollFlat: createFlatCheckButton(preSelectedCharacterIds, preSelectedDC, selectedTokens),
             cancel: {
                 icon: '<i class="fas fa-times"></i>',
@@ -351,14 +352,13 @@ function buildStandardDcButtons() {
     `).join('');
 }
 
-function createRollButton(preSelectedCharacterIds, preSelectedSkills, preSelectedDC, selectedTokens) {
+function createRollButton(preSelectedCharacterIds, preSelectedSkills, preSelectedDC, selectedTokens, isBlindGM = false) {
     return {
-        icon: '<i class="fas fa-dice-d20"></i>',
-        label: 'Roll',
+        icon: `<i class="fas ${isBlindGM ? 'fa-eye' : 'fa-dice-d20'}"></i>`,
+        label: isBlindGM ? 'Roll Blind GM' : 'Roll',
         callback: (html) => {
             const selectedSkills = html.find('.skill-button.selected').map((_, el) => el.dataset.skill).get();
             const dc = parseInt(html.find('#dc-input').val(), 10);  // Get the updated DC value
-            const isBlindGM = html.find('[name="blindGM"]').is(':checked'); // Get the value of the blind GM checkbox
             const selectedCharacterIds = html.find('[name="character"]:checked').map((_, el) => el.value).get();
             if (selectedSkills.length === 0) {
                 ui.notifications.warn("Please select at least one skill or save to roll.");
@@ -758,11 +758,14 @@ function createCharacterBox(character, skillsToRoll, dc, isBlindGM, index, chara
     });
     box.appendChild(skillSelect);
 
-    const rollButton = document.createElement('button');
-    rollButton.textContent = 'Roll';
-    rollButton.style.display = 'block';
-    rollButton.style.margin = '10px auto';
-    box.appendChild(rollButton);
+    let rollButton;
+    if (!isBlindGM) {
+        rollButton = document.createElement('button');
+        rollButton.textContent = 'Roll';
+        rollButton.style.display = 'block';
+        rollButton.style.margin = '10px auto';
+        box.appendChild(rollButton);
+    }
 
     const rollBlindButton = document.createElement('button');
     rollBlindButton.textContent = 'Roll Blind GM';
@@ -788,7 +791,9 @@ function createCharacterBox(character, skillsToRoll, dc, isBlindGM, index, chara
         box.classList.add('visible');
     }, 500 + index * 200);
 
-    addRollButtonEventListener(rollButton, character, skillSelect, box, dc, characterBoxes, resultsSummary);
+    if (!isBlindGM) {
+        addRollButtonEventListener(rollButton, character, skillSelect, box, dc, characterBoxes, resultsSummary);
+    }
     addRollBlindButtonEventListener(rollBlindButton, character, skillSelect, box, dc, characterBoxes, resultsSummary);
 
     return box;
