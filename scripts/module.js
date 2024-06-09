@@ -54,7 +54,7 @@ Hooks.on("renderApplication", (app, html, data) => {
         // Append the icon to the button
         button.append(icon);
         // Append the button to the skill check element
-        skillCheckElement.append(button);
+        button.insertAfter(skillCheckElement);
         // Extract the skill type and DC from the inline check button
         const skillType = skillCheckElement.attr('data-pf2-check');
         const dc = parseInt(skillCheckElement.attr('data-pf2-dc'), 10);
