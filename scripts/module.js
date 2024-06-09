@@ -771,7 +771,7 @@ function createCharacterBox(character, skillsToRoll, dc, isBlindGM, index, chara
     }, 500 + index * 200);
 
     addRollButtonEventListener(rollButton, character, skillSelect, box, dc, characterBoxes, resultsSummary);
-    addRollBlindButtonEventListener(rollBlindButton, character, skillSelect, box, dc, isBlindGM, characterBoxes, resultsSummary);
+    addRollBlindButtonEventListener(rollBlindButton, character, skillSelect, box, dc, characterBoxes, resultsSummary);
 
     return box;
 }
@@ -805,7 +805,7 @@ function addRollButtonEventListener(rollButton, character, skillSelect, box, dc,
     });
 }
 
-function addRollBlindButtonEventListener(rollBlindButton, character, skillSelect, box, dc, isBlindGM, characterBoxes, resultsSummary) {
+function addRollBlindButtonEventListener(rollBlindButton, character, skillSelect, box, dc, characterBoxes, resultsSummary) {
     rollBlindButton.addEventListener('click', async () => {
         const selectedSkill = skillSelect.value;
         const resultArea = box.querySelector('.result-area');
@@ -826,21 +826,17 @@ function addRollBlindButtonEventListener(rollBlindButton, character, skillSelect
             result = await performSkillOrSaveCheck(skillKey, character, dc, true);
         }
         if (result) {
-            if (isBlindGM) {
-                resultArea.textContent = `Result: ???`;
-                indicatorArea.innerHTML = '';
-                const indicator = document.createElement('span');
-                indicator.textContent = "???";
-                indicatorArea.appendChild(indicator);
-                resultsSummary.push(`${character.name}: ${selectedSkill} - ???`);
-            } else {
-                displayRollResult(result, resultArea, indicatorArea, character, selectedSkill, characterBoxes, resultsSummary, box);
-            }
+            resultArea.textContent = `Result: ???`;
+            indicatorArea.innerHTML = '';
+            const indicator = document.createElement('span');
+            indicator.textContent = "???";
+            indicatorArea.appendChild(indicator);
+            resultsSummary.push(`${character.name}: ${selectedSkill} - ???`);
         }
         resultsManager.addResult({
             character: character.name,
             skill: selectedSkill,
-            outcome: isBlindGM ? "???" : result.total
+            outcome: "???",
         });
     });
 }
