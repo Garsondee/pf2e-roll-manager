@@ -47,24 +47,42 @@ Hooks.on("renderApplication", (app, html, data) => {
     // Find all inline check elements with the 'with-repost' class
     html.find("a.inline-check.with-repost").each(function () {
         const skillCheckElement = $(this);
-        // Create the button element
-        const button = $(`<button class="inline-dc-extra-skillbutton"></button>`);
-        // Create the icon element with the new CSS class
-        const icon = $('<i class="fas fa-dice-d20 no-click-through"></i>');
-        // Append the icon to the button
-        button.append(icon);
-        // Append the button to the skill check element
-        button.insertAfter(skillCheckElement);
         // Extract the skill type and DC from the inline check button
         const skillType = skillCheckElement.attr('data-pf2-check');
         const dc = parseInt(skillCheckElement.attr('data-pf2-dc'), 10);
-        // Add click event listener to the button
-        button.on("click", function () {
-            const preSelectedSkills = skillType ? [skillType.charAt(0).toUpperCase() + skillType.slice(1)] : [];
-            handleDiceButtonClick(preSelectedSkills, dc);
-        });
+        renderInlineCheckButton(skillCheckElement, skillType, dc);
     });
 });
+
+Hooks.on('renderItemSheet', (item, html, data) => {
+    // Find all inline check elements with the 'with-repost' class
+    html.find("[data-pf2-action].with-repost").each(function () {
+        const skillCheckElement = $(this);
+        // Extract the skill type inline check button
+        const skillType = skillCheckElement.text();
+        // Ensure we're not doing this for checks that aren't skills or saves
+        if (skillsAndSaves.includes(skillType)) {
+            renderInlineCheckButton(skillCheckElement, skillType, null);
+        }
+    });
+});
+
+function renderInlineCheckButton(skillCheckElement, skillType, dc) {
+    // Create the button element
+    const button = $(`<button type="button" class="inline-dc-extra-skillbutton"></button>`);
+    // Create the icon element with the new CSS class
+    const icon = $('<i class="fas fa-dice-d20 no-click-through"></i>');
+    // Append the icon to the button
+    button.append(icon);
+    // Append the button to the skill check element
+    button.insertAfter(skillCheckElement);
+
+    // Add click event listener to the button
+    button.on("click", function (event) {
+        const preSelectedSkills = skillType ? [skillType.charAt(0).toUpperCase() + skillType.slice(1)] : [];
+        handleDiceButtonClick(preSelectedSkills, dc);
+    });
+}
 
 // Classes
 class ResultsManager {
