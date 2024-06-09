@@ -215,28 +215,8 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
         default: 'roll',
         render: (html) => {
             setupDialog(html, selectedTokens, initialDC, levelBasedDC);
-
-            // Add event listener to checkbox using jQuery
-            html.find('#hide-dc-checkbox').on('change', function () {
-                const showDCForRoll = $(this).prop('checked');
-                game.settings.set('pf2e-roll-manager', 'showDCForRoll', showDCForRoll);
-                // Update the heading with the new showDCForRoll value
-                updateHeadingWithDC(selectedTokens, initialDC, levelBasedDC, showDCForRoll);
-            });
         }
     }, {width: 620, height: 860}).render(true);
-}
-
-async function updateHeadingWithDC(selectedTokens, initialDC, levelBasedDC, showDCForRoll) {
-    // Retrieve skills to roll and DC values here
-    const skillsToRoll = []; // Assuming you get the skills from somewhere
-    const dc = 0; // Assuming you get the DC from somewhere
-
-    const heading = await createHeadingWithDC(skillsToRoll, dc, showDCForRoll);
-
-    // Update the heading in your UI
-    // Example: document.getElementById('headingContainer').innerHTML = '';
-    // Example: document.getElementById('headingContainer').appendChild(heading);
 }
 
 function buildCharacterSelection(users, preSelectedCharacterIds, characterLevels) {
@@ -308,7 +288,6 @@ function buildDialogContent(preSelectedSkills, initialDC, characterSelection) {
         <div><hr></div>
         <!-- Additional Options Section -->
         <div class="additional-options">
-<!--            <label><input type="checkbox" id="hide-dc-checkbox" name="hide-dc"> Hide DC</label>-->
         </div>
         <div><hr></div>
         <div class="kofi-donation">
