@@ -390,32 +390,6 @@ function setupDialog(html, selectedTokens, initialDC, levelBasedDC) {
         }
     });
 
-    // Move the initialization inside the function
-    let showDCSetting = game.settings.get("pf2e-roll-manager", "showDCForRoll");
-
-    // Function to toggle visibility of DC elements based on setting value
-    function toggleDCVisibility() {
-        const dcElements = html.find('.dc-slider-container, .level-based-dc-buttons, .standard-dc-buttons');
-        if (showDCSetting) {
-            dcElements.show();
-        } else {
-            dcElements.hide();
-        }
-    }
-
-    // Initial setup based on setting value
-    toggleDCVisibility();
-
-    // // Event listener for setting change
-    // game.settings.onChange('pf2e-roll-manager', setting => {
-    //     if (setting === 'showDCForRoll') {
-    //         showDCSetting = game.settings.get("pf2e-roll-manager", "showDCForRoll");
-    //         toggleDCVisibility();
-    //     }
-    // });
-
-
-
     const dcSlider = html.find('#dc-slider');
     const dcSliderValue = html.find('#dc-slider-value');
     dcSlider.on('input', function () {
