@@ -661,7 +661,7 @@ function createContainer() {
     return container;
 }
 
-async function createHeadingWithDC(skillsToRoll, dc, showDCForRoll) {
+async function createHeadingWithDC(skillsToRoll, dc, isBlindGM) {
     // Use showDCForRoll parameter to decide whether to include DC in heading text
     let formattedSkills;
     if (skillsToRoll.length === 1) {
@@ -674,8 +674,7 @@ async function createHeadingWithDC(skillsToRoll, dc, showDCForRoll) {
         formattedSkills = skillsToRoll.join(', '); // For more than 3 skills, if needed.
     }
 
-    showDCForRoll = await game.settings.get('pf2e-roll-manager', 'showDCForRoll');
-
+    const showDCForRoll = await game.settings.get('pf2e-roll-manager', 'showDCForRoll') && !isBlindGM;
 
     const heading = document.createElement('h1');
     if (showDCForRoll === true) {
@@ -691,8 +690,8 @@ async function createHeadingWithDC(skillsToRoll, dc, showDCForRoll) {
     return heading;
 }
 
-async function createHeadingWrapper(skillsToRoll, dc) {
-    return await createHeadingWithDC(skillsToRoll, dc);
+async function createHeadingWrapper(skillsToRoll, dc, isBlindGM) {
+    return await createHeadingWithDC(skillsToRoll, dc, isBlindGM);
 }
 
 function createCharacterBox(character, skillsToRoll, dc, isBlindGM, index, characterBoxes, resultsSummary) {
@@ -960,7 +959,7 @@ function sendResultsToGM() {
 async function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlindGM) {
     const overlay = createOverlay();
     const container = createContainer();
-    const heading = await createHeadingWrapper(skillsToRoll, dc); // Await the promise
+    const heading = await createHeadingWrapper(skillsToRoll, dc, isBlindGM); // Await the promise
     container.appendChild(heading);
 
     const boxesContainer = document.createElement('div');
