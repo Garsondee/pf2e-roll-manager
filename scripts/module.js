@@ -995,12 +995,13 @@ function refreshCharacterBoxWithRollResult(data) {
         return;
     }
     setTimeout(() => {
-        if ((isBlindGM && !game.user.isGM) || isSecret) {
+        const showResult = !(isBlindGM || isSecret) || game.user.isGM;
+        if (!showResult) {
             resultArea.textContent = `Result: ???`;
             indicatorArea.textContent = "???";
         } else {
             const diceResultsText = diceResults?.join(', ') ?? 'Unknown';
-            resultArea.textContent = `Result: ${total} (Dice: ${diceResultsText})`;
+            resultArea.textContent = `Result: ${total}`;
             switch (degreeOfSuccess) {
                 case 3: // Critical Success
                     indicatorArea.innerHTML = `<span style="color: green">✅ Critical Success ✅</span>`;
