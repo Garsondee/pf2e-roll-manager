@@ -37,7 +37,6 @@ function processSocketData(data) {
 // Hooks
 // Shared functions and variables
 Hooks.once('ready', () => {
-    createAndAppendDiceButton();
     initializeSocketListener();
     logUsersAndAssignedCharacters();
     saveFoundrySettings();
@@ -65,6 +64,8 @@ Hooks.on("renderApplication", (app, html, data) => {
         });
     });
 });
+
+
 
 // Classes
 class ResultsManager {
@@ -133,26 +134,21 @@ function toggleCheckbox(characterId) {
     }
 }
 
-function createAndAppendDiceButton() {
-    if (!game.user.isGM) return;
-    if (document.querySelector('.dice-button')) return;
-    const button = document.createElement('button');
-    button.className = 'dice-button';
-    button.title = 'Roll Dice';
-    button.style.backgroundColor = 'green'; // Set the button color to green
-    const icon = document.createElement('i');
-    icon.className = 'fas fa-dice-d20';
-    button.appendChild(icon);
-    button.addEventListener('click', handleDiceButtonClick);
-    button.style.maxHeight = '40px';
-    button.style.maxWidth = '90%';
-    const sidebar = document.querySelector('#sidebar');
-    if (sidebar) {
-        sidebar.appendChild(button);
-    } else {
-        console.error('Dice Button | Sidebar not found.');
+Hooks.on('getSceneControlButtons', (controls) => {
+    // Find the existing control for 'token' (or any other existing control you want to add the button to)
+    const tokenControl = controls.find(control => control.name === 'token');
+
+    if (tokenControl) {
+        tokenControl.tools.push({
+            name: 'roll-dice',
+            title: 'PF2E Dice Roll Manager',
+            icon: 'fas fa-dice-d20',
+            button: true,
+            onClick: () => handleDiceButtonClick(),
+            visible: game.user.isGM // Only visible to GMs
+        });
     }
-}
+});
 
 function handleDiceButtonClick(preSelectedSkills = [], preSelectedDC = null) {
     const selectedTokens = canvas.tokens.controlled.map(token => token.actor);
@@ -980,7 +976,6 @@ async function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, 
     container.appendChild(exitButton);
     document.body.appendChild(container);
 }
-
 
 function refreshCharacterBoxWithRollResult(data) {
     const {actorId, skillOrSaveKey, dc, result} = data;

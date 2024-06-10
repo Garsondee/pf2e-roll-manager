@@ -16,7 +16,7 @@ process of prompting players for skill or saving rolls during your Pathfinder 2e
 through rulebooks or manually calculating rolls – with this module, you can effortlessly manage rolls and keep the game
 flowing smoothly.
 
-## Features
+## Features 
 
 - **Easy Prompting**: GMs can quickly prompt players for skill or saving rolls via a user-friendly dialog box.
 - **Custom Difficulty**: The GM can set the difficulty level for each roll, tailoring the challenge to fit the
