@@ -38,8 +38,8 @@ function processSocketData(data) {
 // Shared functions and variables
 Hooks.once('ready', () => {
     initializeSocketListener();
-    logUsersAndAssignedCharacters();
     saveFoundrySettings();
+    logUsersAndAssignedCharacters();
 });
 
 Hooks.on("renderApplication", (app, html, data) => {
@@ -63,6 +63,22 @@ Hooks.on("renderApplication", (app, html, data) => {
             handleDiceButtonClick(preSelectedSkills, dc);
         });
     });
+});
+
+Hooks.on('getSceneControlButtons', (controls) => {
+    // Find the existing control for 'token' (or any other existing control you want to add the button to)
+    const tokenControl = controls.find(control => control.name === 'token');
+
+    if (tokenControl) {
+        tokenControl.tools.push({
+            name: 'roll-dice',
+            title: 'PF2E Dice Roll Manager',
+            icon: 'fas fa-dice-d20',
+            button: true,
+            onClick: () => handleDiceButtonClick(),
+            visible: game.user.isGM // Only visible to GMs
+        });
+    }
 });
 
 // Classes
@@ -132,23 +148,8 @@ function toggleCheckbox(characterId) {
     }
 }
 
-Hooks.on('getSceneControlButtons', (controls) => {
-    // Find the existing control for 'token' (or any other existing control you want to add the button to)
-    const tokenControl = controls.find(control => control.name === 'token');
-
-    if (tokenControl) {
-        tokenControl.tools.push({
-            name: 'roll-dice',
-            title: 'PF2E Dice Roll Manager',
-            icon: 'fas fa-dice-d20',
-            button: true,
-            onClick: () => handleDiceButtonClick(),
-            visible: game.user.isGM // Only visible to GMs
-        });
-    }
-});
-
 function handleDiceButtonClick(preSelectedSkills = [], preSelectedDC = null) {
+    logUsersAndAssignedCharacters();
     const selectedTokens = canvas.tokens.controlled.map(token => token.actor);
     if (!game.user.isGM) {
         ui.notifications.warn("Only the GM can use this button.");
@@ -197,13 +198,22 @@ function renderRollManagerDialog(selectedTokens = [], preSelectedCharacterIds = 
 
 function buildCharacterSelection(users, preSelectedCharacterIds, characterLevels) {
     let characterSelection = '<div class="character-selection-grid">';
+    const activeScene = game.scenes.active;
+    const sceneTokens = activeScene.tokens.contents;
+
     users.forEach(user => {
         const characters = game.actors.contents.filter(actor => {
             return actor.type === 'character' && actor.hasPlayerOwner && actor.ownership[user.id] === 3;
         });
-        if (characters.length > 0) {
+
+        // Filter characters that have a token in the current scene
+        const charactersInScene = characters.filter(character => {
+            return sceneTokens.some(token => token.actorId === character.id);
+        });
+
+        if (charactersInScene.length > 0) {
             characterSelection += `<div class="user-column"><strong>${user.name}</strong>`;
-            characters.forEach(character => {
+            charactersInScene.forEach(character => {
                 const tokenTexture = character.prototypeToken.texture.src || '';
                 characterSelection += `
                     <div class="character-selection">
@@ -224,6 +234,7 @@ function buildCharacterSelection(users, preSelectedCharacterIds, characterLevels
     characterSelection += '</div>';
     return characterSelection;
 }
+
 
 function buildDialogContent(preSelectedSkills, initialDC, characterSelection) {
     return `
@@ -494,28 +505,56 @@ function refreshDialogContent(dialogId, newContent) {
 }
 
 function logUsersAndAssignedCharacters() {
+
+    console.log("PF2E Roll Manager: Checking Characters");
+
     // Ensure the game data is fully loaded
-    if (!game.users || !game.actors) {
-        console.error("Game data is not fully loaded.");
+    if (!game.users || !game.actors || !game.scenes || !game.scenes.active) {
+        console.error("Game data is not fully loaded or no active scene.");
         return;
     }
+
+    // Get the active scene
+    const activeScene = game.scenes.active;
+
+    // Get all tokens in the active scene
+    const sceneTokens = activeScene.tokens.contents;
+
+    // Log all actor names
+    const allActorNames = game.actors.contents.map(actor => actor.name);
+    console.log("All Actors:", allActorNames);
+
     // Get all users
     const users = game.users.contents;
+
     users.forEach(user => {
+        console.log(`Checking characters for user: ${user.name}`);
+
         // Get the characters assigned to the user
         const characters = game.actors.contents.filter(actor => {
             // Check if the actor is of type 'character' and has the correct ownership level
             return actor.type === 'character' && actor.hasPlayerOwner && actor.ownership[user.id] === 3;
         });
-        characters.forEach(character => {
+
+        // Filter characters that have a token in the current scene
+        const charactersInScene = characters.filter(character => {
+            return sceneTokens.some(token => token.actorId === character.id);
+        });
+
+        console.log(`Characters assigned to user ${user.name} in the scene:`, charactersInScene.map(character => character.name));
+
+        charactersInScene.forEach(character => {
             // Get the token texture from the prototype token
             const tokenTexture = character.prototypeToken.texture.src;
             if (tokenTexture) {
+                console.log(`User: ${user.name}, Character: ${character.name}, Token Texture: ${tokenTexture}`);
             } else {
+                console.log(`User: ${user.name}, Character: ${character.name}, Token Texture: Not Set`);
             }
         });
     });
 }
+
 
 async function displayCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlindGM) {
     // Broadcast the creation event to all clients
