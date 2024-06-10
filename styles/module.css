@@ -155,13 +155,11 @@
     flex-wrap: inherit;
 }
 
-/* User Column */
 .user-column {
-    flex: 1;
     border-radius: 8px;
-    min-width: max-content;
     text-align: center;
     font-size: large;
+    width: 150px;
 }
 
 /* Character Selection */
@@ -185,7 +183,7 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .skill-save-selection, .dc-buttons, .level-based-dc-buttons, .standard-dc-buttons, .character-selection-grid {
+    .skill-save-selection, .dc-buttons, .level-based-dc-buttons, .standard-dc-buttons {
         flex-direction: column;
         align-items: stretch;
     }

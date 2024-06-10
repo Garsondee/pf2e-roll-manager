@@ -65,8 +65,6 @@ Hooks.on("renderApplication", (app, html, data) => {
     });
 });
 
-
-
 // Classes
 class ResultsManager {
     constructor() {
@@ -529,7 +527,7 @@ async function displayCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, i
         isBlindGM
     });
     // Create the character boxes for the GM
-    generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlindGM);
+    await generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, isBlindGM);
 }
 
 function getSkillModifier(character, skillKey) {
