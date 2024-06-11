@@ -301,7 +301,7 @@ function buildDialogContent(preSelectedSkills, initialDC, characterSelection) {
         <div class="kofi-donation">
             <label> Want to support this module? Please consider a <a href="https://ko-fi.com/mythicamachina">donation</a> to help pay for development. </label>
             <a href="https://ko-fi.com/mythicamachina">
-                <img src="modules/pf2e-roll-manager/img/kofilogo.png" alt="Ko-Fi Logo" style="height: 25px; border: none;" />
+                <img src="modules/pf2e-roll-manager/assets/kofilogo.png" alt="Ko-Fi Logo" style="height: 25px; border: none;" />
             </a>
         </div>
         <div><hr></div>
