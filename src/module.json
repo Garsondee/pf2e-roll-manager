@@ -2,14 +2,6 @@
   "id": "pf2e-roll-manager",
   "title": "Pathfinder 2E Roll Manager",
   "description": "This module makes setting up DC checks easier for groups of players and busy GMs.",
-  "version": "#{VERSION}#",
-  "library": "false",
-  "manifestPlusVersion": "1.2.0",
-  "compatibility": {
-    "minimum": 11,
-    "verified": 11,
-    "maximum": 11
-  },
   "authors": [
     {
       "name": "Ingram Blakelock (Mythica Machina)",
@@ -17,36 +9,43 @@
       "discord": "garsondee"
     }
   ],
-  "relationships": {
-    "systems": [],
-    "requires": []
+  "url": "This is auto replaced",
+  "license": "MIT",
+  "readme": "README.md",
+  "version": "This is auto replaced",
+  "compatibility": {
+    "minimum": "11",
+    "verified": "11",
+    "maximum": "11"
   },
+  "scripts": [],
   "esmodules": [
-    "scripts/module.js"
-  ],
-  "scripts": [
-    "scripts/lib/lib.js"
+    "module/pf2e-roll-manager.js"
   ],
   "styles": [
-    "styles/module.css"
+    "styles/pf2e-roll-manager.css"
   ],
+  "packs": [],
   "languages": [
     {
       "lang": "en",
       "name": "English",
-      "path": "languages/en.json"
+      "path": "lang/en.json"
     }
   ],
-  "url": "#{URL}#",
-  "manifest": "#{MANIFEST}#",
-  "download": "#{DOWNLOAD}#",
-  "license": "LICENSE",
-  "readme": "README.md",
+  "relationships": {
+    "systems": [],
+    "requires": [],
+    "conflicts": []
+  },
+  "socket": true,
+  "manifest": "This is auto replaced",
+  "download": "This is auto replaced",
+  "library": false,
   "media": [
     {
       "type": "icon",
       "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4"
     }
-  ],
-  "socket": true
+  ]
 }
