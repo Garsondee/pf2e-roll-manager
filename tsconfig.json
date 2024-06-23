@@ -1,12 +1,29 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["DOM", "ES2020"],
-    "types": ["@league-of-foundry-developers/foundry-vtt-types"],
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "forceConsistentCasingInFileNames": true,
-    "strict": true
-  },
-  "include": ["src"]
+    "compilerOptions": {
+        "target": "ES2020",
+        "lib": [
+            "DOM",
+            "ES2020"
+        ],
+        "types": [
+            "@league-of-foundry-developers/foundry-vtt-types"
+        ],
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "@league-of-foundry-developers/foundry-vtt-types": [
+                "node_modules/@league-of-foundry-developers/foundry-vtt-types"
+            ]
+        }
+    },
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
 }
