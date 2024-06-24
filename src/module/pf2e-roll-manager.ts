@@ -281,7 +281,7 @@ function buildCharacterSelection(
 
     users.forEach(user => {
         const characters = game.actors.contents.filter(actor => {
-            return actor.type === 'character' && actor.hasPlayerOwner && actor.ownership[user.id] === 3;
+            return actor.isOfType('character') && actor.hasPlayerOwner && actor.ownership[user.id] === 3;
         });
 
         // Filter characters that have a token in the current scene
@@ -291,7 +291,7 @@ function buildCharacterSelection(
 
         // Filter NPCs that have a token in the current scene and the player owns them
         const npcsInScene = sceneTokens.filter(token => {
-            return token.actor.data.type === 'npc' && token.actor.hasPlayerOwner && token.actor.ownership[user.id] === 3;
+            return token.actor.isOfType('npc') && token.actor.hasPlayerOwner && token.actor.ownership[user.id] === 3;
         }).map(token => token.actor);
 
         const charactersAndNPCsInScene = charactersInScene.concat(npcsInScene);
