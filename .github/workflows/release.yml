@@ -16,7 +16,7 @@ jobs:
 #        uses: actions/checkout@v2
 #
 #      - name: Install node
-#        uses: actions/setup-node@v2
+#        uses: actions/setup-node@v4
 #        with:
 #          node-version: ${{ env.node_version }}
 #
@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
 
@@ -68,7 +68,7 @@ jobs:
 #        uses: actions/checkout@v2
 #
 #      - name: Install node
-#        uses: actions/setup-node@v2
+#        uses: actions/setup-node@v4
 #        with:
 #          node-version: ${{ env.node_version }}
 #
@@ -94,7 +94,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node_version }}
 
