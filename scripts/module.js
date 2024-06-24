@@ -211,16 +211,9 @@ function buildCharacterSelection(users, preSelectedCharacterIds, characterLevels
             return sceneTokens.some(token => token.actorId === character.id);
         });
 
-        // Filter NPCs that have a token in the current scene and the player owns them
-        const npcsInScene = sceneTokens.filter(token => {
-            return token.actor && token.actor.data.type === 'npc' && token.actor.hasPlayerOwner && token.actor.ownership[user.id] === 3;
-        }).map(token => token.actor);
-
-        const charactersAndNPCsInScene = charactersInScene.concat(npcsInScene);
-
-        if (charactersAndNPCsInScene.length > 0) {
+        if (charactersInScene.length > 0) {
             characterSelection += `<div class="user-column"><strong>${user.name}</strong>`;
-            charactersAndNPCsInScene.forEach(character => {
+            charactersInScene.forEach(character => {
                 const tokenTexture = character.prototypeToken.texture.src || '';
                 characterSelection += `
                     <div class="character-selection">
