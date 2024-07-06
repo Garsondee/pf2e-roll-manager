@@ -1,4 +1,3 @@
-
 const multiStatisticActions = {
 	'arrest-a-fall': ['acrobatics', 'reflex'],
 	'decipher-writing': ['arcana', 'occultism', 'society', 'religion'],
