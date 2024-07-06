@@ -1,0 +1,586 @@
+/* General Button Styles */
+.dice-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 26px;
+  width: 97%;
+  margin: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  transform: translate(10px, -4px);
+
+}
+
+.dice-button:hover {
+  background-color: #45a049;
+}
+
+/* Form Section Titles and Layout */
+.skill-form-group{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+
+/* Flexbox Layout */
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.flex-container .form-group {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
+.flex-container .form-group select {
+  margin-right: 10px;
+}
+
+/* Skill/Save Selection */
+.skill-save-selection .form-group {
+  flex: 1 1 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.skill-save-selection .form-group label {
+  margin-bottom: 0.5em;
+  padding: 15px;
+}
+
+.skill-save-selection .form-group select {
+  font-size: 16px;
+}
+
+/* DC Input Group */
+.dc-input-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px;
+}
+
+.dc-adjust {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 5px 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  width: 58px;
+  font-size: 16px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.dc-adjust:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.01);
+}
+
+.dc-adjust:focus {
+  outline: 2px solid #4CAF50;
+}
+
+.dc-buttons input {
+  width: 150px;
+  height: 40px;
+  vertical-align: bottom;
+  text-align: center;
+  font-size: 24px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 5px;
+  background-color: #9ad196;
+}
+
+/* Level Based DCs */
+.level-based-dc-buttons .level-dc, .dc-adjustment {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 2px 2px;
+  cursor: pointer;
+  width: 32%;
+  flex: auto;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin: 0px 0px 6px;
+
+}
+
+.level-dc:hover, .dc-adjustment:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.05);
+}
+
+.level-dc:focus, .dc-adjustment:focus {
+  outline: 2px solid #4CAF50;
+}
+
+/* Standard DC Buttons */
+.standard-dc-buttons .standard-dc {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 90px;
+}
+
+.standard-dc:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.05);
+}
+
+.standard-dc:focus {
+  outline: 2px solid #4CAF50;
+}
+
+/* Character Selection Grid */
+.character-selection-grid {
+  display: flex;
+  flex-wrap: inherit;
+}
+
+.user-column {
+  border-radius: 8px;
+  text-align: center;
+  font-size: large;
+  width: 150px;
+}
+
+/* Character Selection */
+.character-selection {
+  display: flex;
+  flex-wrap: nowrap !important;
+  align-items: center;
+}
+
+.character-name {
+  flex: 1;
+  font-size: 16px;
+  text-align: center;
+}
+
+.character-token img {
+  border: none;
+  width: 100px;
+  height: 100px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .skill-save-selection, .dc-buttons, .level-based-dc-buttons, .standard-dc-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Form Validation Feedback */
+input:invalid {
+  border-color: red;
+}
+
+input:valid {
+  border-color: green;
+}
+
+/* CSS for the blackout div */
+#blackout-div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0.8;
+  transition: opacity 2s ease-in-out;
+  z-index: 28 !important;
+}
+
+/* CSS for the character box container */
+#character-box-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 29 !important;
+  width: 90% !important;
+  transform: translateX(-55%) !important;
+}
+
+/* CSS for individual character boxes */
+.character-box {
+  margin: 0 10px;
+  padding: 20px;
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 10px;
+  text-align: center;
+  opacity: 0; /* Start with opacity 0 */
+  transition: opacity 1s ease-in-out; /* Transition opacity over 1 second */
+  z-index: 29;
+}
+
+/* CSS for the result area */
+.result-area {
+  margin-top: 10px;
+  min-height: 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+/* Fade animations */
+.fade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+  z-index: 100;
+}
+
+.fade-in {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.visible {
+  opacity: 1;
+
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+
+.non-interactive-overlay {
+  pointer-events: none;
+}
+
+.interactive-overlay {
+  pointer-events: auto;
+}
+
+button {
+  pointer-events: auto !important;
+
+}
+
+.skill-app {
+  height: min-content !important;
+}
+
+.skill-group-selection-flow {
+  width: 199px;
+}
+
+.support-label {
+  font-size: 12px;
+  color: #333;
+}
+
+.kofi-logo {
+  height: 25px;
+  border: none;
+  transform: translate(18px, 8px);
+
+}
+
+.character-button {
+
+  background-color: #f0f0f0;
+
+  border: 1px solid #ccc;
+
+  border-radius: 5px;
+
+
+  cursor: pointer;
+
+  transition: background-color 0.3s, border-color 0.3s;
+
+}
+
+
+
+.character-button.selected {
+
+  background-color: #d0e0f0;
+
+  border-color: #007bff;
+
+}
+
+.level-based-dc-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px; /* Adjust the gap between buttons if needed */
+}
+
+.dc-adjustment {
+  display: inline-block;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dc-adjustment .label {
+  display: block;
+}
+
+.dc-adjustment .adjustment {
+  display: block;
+  font-weight: normal; /* Ensure the adjustment value is not bold */
+  font-size: 0.9em; /* Adjust the font size if needed */
+}
+
+.standard-dc-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px; /* Adjust the gap between buttons if needed */
+}
+
+.standard-dc {
+  display: inline-block;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ccc; /* Customize the border */
+  border-radius: 5px; /* Optional: Add border radius */
+  cursor: pointer;
+}
+
+.standard-dc .label, .standard-dc .dc {
+  display: block;
+}
+
+.standard-dc .dc {
+  font-size: 0.9em; /* Adjust the font size if needed */
+}
+
+.level-dc-normal {
+  width: 163px;
+  background-color: #f0f0f0;
+  border: none;
+}
+
+.skill-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  width: 100%;
+}
+
+.skill-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.skill-button.selected {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+.dc-input {
+  width: 90px !important;
+  text-align: center !important;
+  height: 32px !important;
+  font-weight: bolder;
+  font-size: larger !important;
+  border: 2px solid #007BFF !important; /* Blue border */
+  border-radius: 8px !important; /* Rounded corners */
+  background-color: #f0f8ff !important; /* Light blue background */
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important; /* Subtle shadow */
+  transition: all 0.3s ease-in-out !important; /* Smooth transition for hover and focus */
+  margin: 10px 0 !important; /* Space around the input */
+}
+
+.dc-input:hover {
+  background-color: #e0f0ff !important; /* Slightly darker background on hover */
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3) !important; /* Larger shadow on hover */
+}
+
+.dc-input:focus {
+  background-color: #ffffff !important; /* White background on focus */
+  border-color: #0056b3 !important; /* Darker blue border on focus */
+  outline: none !important; /* Remove default outline */
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.5) !important; /* Larger shadow on focus */
+}
+
+.slider-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#dc-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 40px; /* Adjust the height as needed */
+  background: none;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#dc-slider:hover {
+  opacity: 1;
+}
+
+#dc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 45px; /* Adjust the width of the thumb */
+  height: 25px; /* Adjust the height of the thumb */
+  background: #4CAF50;
+  cursor: pointer;
+  transition: background 0.3s;
+  border-radius: 5px; /* Slight rounding for the corners */
+  transform: translateY(-7px);
+}
+
+#dc-slider::-webkit-slider-thumb:hover {
+  background: #45a049;
+}
+
+#dc-slider::-moz-range-thumb {
+  width: 45px; /* Adjust the width of the thumb */
+  height: 25px; /* Adjust the height of the thumb */
+  background: #4CAF50;
+  cursor: pointer;
+  transition: background 0.3s;
+  border-radius: 5px; /* Slight rounding for the corners */
+  transform: translateY(-7px);
+
+}
+
+#dc-slider::-moz-range-thumb:hover {
+  background: #45a049;
+}
+
+:root {
+  --dc-slider-color: #4CAF50;
+}
+
+#dc-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 40px; /* Adjust the height as needed */
+  background: none;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#dc-slider:hover {
+  opacity: 1;
+}
+
+#dc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 45px; /* Adjust the width of the thumb */
+  height: 25px; /* Adjust the height of the thumb */
+  background: var(--dc-slider-color);
+  cursor: pointer;
+  transition: background 0.3s;
+  border-radius: 5px; /* Slight rounding for the corners */
+  transform: translateY(-7px);
+}
+
+#dc-slider::-webkit-slider-thumb:hover {
+  background: var(--dc-slider-color);
+}
+
+#dc-slider::-moz-range-thumb {
+  width: 45px; /* Adjust the width of the thumb */
+  height: 25px; /* Adjust the height of the thumb */
+  background: var(--dc-slider-color);
+  cursor: pointer;
+  transition: background 0.3s;
+  border-radius: 5px; /* Slight rounding for the corners */
+  transform: translateY(-7px);
+}
+
+#dc-slider::-moz-range-thumb:hover {
+  background: var(--dc-slider-color);
+}
+
+.inline-dc-extra-skillbutton {
+  width: 70px;
+  height: 19px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: -65px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 0px 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  transform: translate(0px, 3px);
+  pointer-events: auto;
+}
+
+.dice-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 26px;
+  width: 97%;
+  margin: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  transform: translate(10px, -4px);
+}
+
+.no-click-through {
+  pointer-events: none;
+  translate: 3px -4px;
+}
+
+
+.dc-input-box {
+  background-color: var(--dc-slider-color) !important;
+  color: #000000 !important;
+  width: 75px !important;
+  height: 36px !important;
+  text-align: center !important;
+  font-size: larger !important;
+}
