@@ -1,3 +1,74 @@
+function handleDiceButtonClick(preSelectedSkills, dc) {
+	createActionDropdown({
+		defaultDC: dc,
+		excludeActions: [],
+		gameSystem: game.pf2e,
+		defaultRollMode: "publicroll",
+		defaultCreateMessage: true,
+		defaultSkipDialog: false,
+	}).then(dialog => {
+		// Use the render hook to ensure the dialog is fully rendered
+		Hooks.once('renderDialog', (app, html) => {
+			// Pre-select the skills in the dialog
+			preSelectedSkills.forEach(skill => {
+				const skillButton = html.find(`.skill-button[data-slug="${skill.toLowerCase()}"]`);
+				if (skillButton.length) {
+					skillButton.addClass('selected');
+				} else {
+					console.error('Skill button not found in dialog for skill:', skill);
+				}
+			});
+
+			// Set the DC value in the dialog
+			const dcInput = html.find('#dc-input');
+			if (dcInput.length) {
+				dcInput.val(dc);
+				dcInput.trigger('change'); // Trigger change event to ensure any listeners are updated
+			} else {
+				console.error('DC input field not found in dialog.');
+			}
+		});
+	}).catch(error => {
+		console.error('Error opening GM dialog:', error);
+	});
+}
+
+// Hook into the rendering process of applications
+Hooks.on("renderApplication", (app, html, data) => {
+	// Check if the current user is a GM
+	if (!game.user.isGM) return;
+
+	// Find all inline check elements with the 'with-repost' class
+	html.find("a.inline-check.with-repost").each(function () {
+		const skillCheckElement = $(this);
+
+		// Create the button element with additional CSS styles
+		const button = $(`<button class="inline-dc-extra-skillbutton" style=" margin-left: 5px; width: 35px; height: 20px; top: 6px; border-radius: 4px; cursor: pointer; font-size: 14px; position: relative; "></button>`);
+		const icon = $('<i class="fas fa-dice no-click-through"></i>').css({
+			fontSize: '14px',
+			position: 'relative',
+			top: '-6px',
+			right: '-1px'
+		});
+
+		// Append the icon to the button
+		button.append(icon);
+
+		// Append the button to the skill check element
+		button.insertAfter(skillCheckElement);
+
+		// Extract the skill type and DC from the inline check button
+		const skillType = skillCheckElement.attr('data-pf2-check');
+		const dc = parseInt(skillCheckElement.attr('data-pf2-dc'), 10);
+
+		// Add click event listener to the button
+		button.on("click", function () {
+			const preSelectedSkills = skillType ? [skillType.charAt(0).toUpperCase() + skillType.slice(1)] : [];
+			handleDiceButtonClick(preSelectedSkills, dc);
+		});
+	});
+});
+
 const multiStatisticActions = {
 	'arrest-a-fall': ['acrobatics', 'reflex'],
 	'decipher-writing': ['arcana', 'occultism', 'society', 'religion'],
@@ -213,7 +284,7 @@ let selectedCharacterUUIDs = new Set();
 function attachCharacterSelectionListeners(container) {
 	console.log("Attaching character selection listeners...");
 	container.querySelectorAll('.character-select-button').forEach(button => {
-		console.log("Attaching listener to button:", button);
+		// console.log("Attaching listener to button:", button);
 		button.addEventListener('click', (event) => {
 			const button = event.currentTarget;
 			const actorUuid = button.dataset.actorUuid;
@@ -765,21 +836,23 @@ async function executeInstantRoll(selectedActors, selectedActions, dc, createMes
 				statistic = null;
 			}
 			console.log(`Processing action: ${actionSlug}, statistic: ${statistic}`);
-			// Check if the action is listed under 'Multiple' and if it was selected from the initial dialog
-			if (multiStatisticActions[actionSlug] && fromDialog) {
-				ui.notifications.warn(`The action "${actionSlug}" cannot be used with Instant Roll. Please select a specific skill.`);
-				return;
+
+			// Check if the action requires a token
+			const requiresToken = !['perception', 'acrobatics', 'arcana', 'athletics', 'crafting', 'deception', 'diplomacy', 'intimidation', 'medicine', 'nature', 'occultism', 'performance', 'religion', 'society', 'stealth', 'survival', 'thievery', 'fortitude', 'reflex', 'will'].includes(actionSlug);
+
+			if (requiresToken) {
+				const tokens = actor.getActiveTokens(true);
+				if (tokens.length > 0) {
+					const token = tokens[0];
+					console.log(`Token found for actor ${actor.name}:`, token);
+					token.control({releaseOthers: true});
+				} else {
+					console.error(`No active token found for actor ${actor.name} with UUID ${actor.uuid}`);
+					ui.notifications.error(`No active token found for actor ${actor.name} with UUID ${actor.uuid}.`);
+					continue;
+				}
 			}
-			const tokens = actor.getActiveTokens(true);
-			if (tokens.length > 0) {
-				const token = tokens[0];
-				console.log(`Token found for actor ${actor.name}:`, token);
-				token.control({releaseOthers: true});
-			} else {
-				console.error(`No active token found for actor ${actor.name} with UUID ${actor.uuid}`);
-				ui.notifications.error(`No active token found for actor ${actor.name} with UUID ${actor.uuid}.`);
-				continue;
-			}
+
 			let result;
 			try {
 				const rollOptions = {event: new Event('click'), rollMode, createMessage, secret: isBlindRoll};
@@ -945,14 +1018,22 @@ async function executeActionRoll(actor, actionSlug, variantSlug, dc, rollOptions
 		if (!action) {
 			throw new Error(`Action ${actionSlug} not found.`);
 		}
-		// Temporarily select the token that the actor owns in the scene
-		const token = canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
-		if (token) {
-			token.control({releaseOthers: true});
-		} else {
-			throw new Error(`No token found for actor ${actor.name}`);
+
+		// Check if the action requires a token
+		const requiresToken = true; // Actions always require a token
+
+		if (requiresToken) {
+			// Temporarily select the token that the actor owns in the scene
+			const token = canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
+			if (token) {
+				token.control({releaseOthers: true});
+			} else {
+				throw new Error(`No token found for actor ${actor.name}`);
+			}
 		}
+
 		const useOptions = {...rollOptions, difficultyClass: dc, skipDialog: true, actor};
+
 		// Apply overrides if they exist
 		if (actionOverrides[actionSlug]) {
 			const override = actionOverrides[actionSlug];
@@ -962,6 +1043,7 @@ async function executeActionRoll(actor, actionSlug, variantSlug, dc, rollOptions
 				variantSlug = override.variants[0];
 			}
 		}
+
 		// Handle specific actions that should not use variants
 		if (actionSlug === "identify-magic" || actionSlug === "recall-knowledge") {
 			if (!selectedStatistic) {
@@ -970,6 +1052,7 @@ async function executeActionRoll(actor, actionSlug, variantSlug, dc, rollOptions
 			useOptions.statistic = selectedStatistic;
 			variantSlug = null; // Ensure no variant is used
 		}
+
 		let result;
 		try {
 			// Attempt to use the action without any variant first
@@ -1275,38 +1358,52 @@ async function generateCharacterRollBoxes(selectedCharacters, skillsToRoll, dc, 
 
 async function addRollButtonEventListener(rollButton, character, skillSelect, box, dc, characterBoxes, resultsSummary) {
 	rollButton.addEventListener('click', async () => {
-		console.log(`Attempting to find token for actor ${character.name} with UUID ${character.uuid}`);
-		const token = canvas.tokens.placeables.find(t => t.actor?.uuid === character.uuid); // Use UUID instead of ID
-		if (token) {
-			console.log(`Token found for actor ${character.name}:`, token);
-			token.control({releaseOthers: true});
-		} else {
-			console.error(`No active token found for actor ${character.name} with UUID ${character.uuid}`);
-			notifyTokenRequired(character.name);
-			return;
-		}
 		const selectedSlug = skillSelect.value;
 		const selectedActions = [selectedSlug];
 		const selectedActors = [character];
+
+		// Check if the action requires a token
+		const requiresToken = !['perception', 'acrobatics', 'arcana', 'athletics', 'crafting', 'deception', 'diplomacy', 'intimidation', 'medicine', 'nature', 'occultism', 'performance', 'religion', 'society', 'stealth', 'survival', 'thievery', 'fortitude', 'reflex', 'will'].includes(selectedSlug.split(':')[0]);
+
+		if (requiresToken) {
+			console.log(`Attempting to find token for actor ${character.name} with UUID ${character.uuid}`);
+			const token = canvas.tokens.placeables.find(t => t.actor?.uuid === character.uuid); // Use UUID instead of ID
+			if (token) {
+				console.log(`Token found for actor ${character.name}:`, token);
+				token.control({releaseOthers: true});
+			} else {
+				console.error(`No active token found for actor ${character.name} with UUID ${character.uuid}`);
+				notifyTokenRequired(character.name);
+				return;
+			}
+		}
+
 		await executeInstantRoll(selectedActors, selectedActions, dc, true, true, 'publicroll', null, false); // Pass false for fromDialog
 	});
 }
 
 function addRollBlindButtonEventListener(rollButton, character, skillSelect, box, dc, characterBoxes, resultsSummary) {
 	rollButton.addEventListener('click', async () => {
-		console.log(`Attempting to find token for actor ${character.name} with UUID ${character.uuid}`);
-		const token = canvas.tokens.placeables.find(t => t.actor?.uuid === character.uuid); // Use UUID instead of ID
-		if (token) {
-			console.log(`Token found for actor ${character.name}:`, token);
-			token.control({releaseOthers: true});
-		} else {
-			console.error(`No active token found for actor ${character.name} with UUID ${character.uuid}`);
-			notifyTokenRequired(character.name);
-			return;
-		}
 		const selectedSlug = skillSelect.value;
 		const selectedActions = [selectedSlug];
 		const selectedActors = [character];
+
+		// Check if the action requires a token
+		const requiresToken = !['perception', 'acrobatics', 'arcana', 'athletics', 'crafting', 'deception', 'diplomacy', 'intimidation', 'medicine', 'nature', 'occultism', 'performance', 'religion', 'society', 'stealth', 'survival', 'thievery', 'fortitude', 'reflex', 'will'].includes(selectedSlug.split(':')[0]);
+
+		if (requiresToken) {
+			console.log(`Attempting to find token for actor ${character.name} with UUID ${character.uuid}`);
+			const token = canvas.tokens.placeables.find(t => t.actor?.uuid === character.uuid); // Use UUID instead of ID
+			if (token) {
+				console.log(`Token found for actor ${character.name}:`, token);
+				token.control({releaseOthers: true});
+			} else {
+				console.error(`No active token found for actor ${character.name} with UUID ${character.uuid}`);
+				notifyTokenRequired(character.name);
+				return;
+			}
+		}
+
 		await executeInstantRoll(selectedActors, selectedActions, dc, true, true, 'blindroll', null, false, {secret: true}); // Pass false for fromDialog and add secret option
 	});
 }

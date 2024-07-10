@@ -1,0 +1,52 @@
+{
+  "id": "pf2e-roll-manager",
+  "title": "Pathfinder 2E Roll Manager",
+  "description": "This module makes setting up DC checks easier for groups of players and busy GMs.",
+  "version": "#{VERSION}#",
+  "library": "false",
+  "manifestPlusVersion": "1.2.0",
+  "compatibility": {
+    "minimum": 11,
+    "verified": 12,
+    "maximum": 12
+  },
+  "authors": [
+    {
+      "name": "Ingram Blakelock (Mythica Machina)",
+      "url": "https://mythicamachina.com/",
+      "discord": "garsondee"
+    }
+  ],
+  "relationships": {
+    "systems": [],
+    "requires": []
+  },
+  "esmodules": [
+    "scripts/module.js"
+  ],
+  "scripts": [
+    "scripts/lib/lib.js"
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "languages/en.json"
+    }
+  ],
+  "url": "#{URL}#",
+  "manifest": "#{MANIFEST}#",
+  "download": "#{DOWNLOAD}#",
+  "license": "LICENSE",
+  "readme": "README.md",
+  "media": [
+    {
+      "type": "icon",
+      "url": "https://avatars2.githubusercontent.com/u/71292812?s=400&u=ccdb4eeb7abf551ca8f314e5a9bfd0479a4d3d41&v=4"
+    }
+  ],
+  "socket": true
+}
