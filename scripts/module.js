@@ -855,7 +855,7 @@ async function executeInstantRoll(selectedActors, selectedActions, dc, createMes
 
 			let result;
 			try {
-				const rollOptions = {event: new Event('click'), rollMode, createMessage, secret: isBlindRoll};
+				const rollOptions = {event: new Event('click'), rollMode, dc, createMessage, secret: isBlindRoll};
 				if (actionSlug === 'recall-knowledge' && statistic) {
 					console.log(`Handling Recall Knowledge action with specific lore: ${statistic}`);
 					const skillSlug = statistic.toLowerCase().replace(/ /g, '-');
