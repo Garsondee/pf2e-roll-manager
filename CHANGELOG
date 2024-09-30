@@ -1,0 +1,10 @@
+V1.75
+
+1.) Allow for multiple DCs for different skills
+2.) Allow for DCs to be changed even once a roll has been setup.
+3.) Generally reworked the underlying code
+4.) Add the ability to pickup new inline skill syntax and create a button which sets up a roll.
+
+Potential Issues:
+
+Some actions might not work correctly if they expect a supporting skill but they have multiple potential options/statistics. This is one of the next areas I want to expand next time.
