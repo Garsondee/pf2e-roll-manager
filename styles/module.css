@@ -1,13 +1,25 @@
 /* Apply styles for skill and character buttons */
-.skill-button,
+.skill-button {
+    background-color: white;
+    color: black;
+    border: 1px solid #ccc;
+    margin: 1px;
+    padding: 0 5px !important;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    height: 26px !important;
+
+}
+
+
 .character-select-button {
     background-color: white;
     color: black;
     border: 1px solid #ccc;
-    padding: 5px 10px;
-    margin: 3px;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
+    height: 180px !important;
+    width: 150px !important;
 }
 
 /* Apply the .selected class uniformly */
@@ -46,6 +58,7 @@
 .skill-button {
     height: 32px;
     width: auto;
+    padding: 0 16px !important;
 }
 
 
@@ -58,9 +71,6 @@
 .dc-adjustment-buttons, .standard-dc-buttons {
     flex-wrap: nowrap !important;
     width: 610px;
-}
-
-.dc-adjustment-buttons {
 }
 
 .skill-button, .dc-adjustment-button, .standard-dc-button, .character-select-button {
@@ -91,8 +101,9 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-end;
+    justify-content: flex-start;
+    align-items: center;
+    width: -webkit-fill-available;
 }
 
 .skill-buttons-row {
@@ -109,19 +120,16 @@
 }
 
 .character-select-button {
-    width: 150px;
-    height: 180px;
+    width: 130px !important;
+    height: 140px !important;
 }
 
 .character-token-image {
     border: 0;
+    height: 100px !important;
+    width: 100px !important;
 }
 
-.standard-dc-buttons flex-container {
-    justify-content: flex-end !important;
-}
-
-/* DC Input Box */
 .dc-input-box {
     text-align: center;
     margin: 10px 0;
@@ -133,7 +141,7 @@
 }
 
 .dc-input-box input {
-    font-size: 1.5em;
+    font-size: 2em;
     font-weight: bold;
     border: 3px solid #26902b;
     background-color: #ffe5e5;
@@ -144,5 +152,71 @@
 }
 
 .details-section {
-    padding-left: 5px;
+    flex: auto;
+    padding-top: 5px;
+}
+
+.standard-dc-item {
+    width:100xp !important;
+}
+
+.dc-container {
+    width: 100% !important;
+}
+
+.character-box-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.character-box fade-in {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.character-box.blind-roll .result-area,
+.character-box.blind-roll .indicator-area {
+    /* Example: Hide the results */
+    display: none;
+}
+
+/* Alternatively, show "???" for non-GM users */
+.character-box.blind-roll.non-gm .result-area::before {
+    content: "???";
+    font-weight: bold;
+    color: gray;
+}
+
+.character-box.blind-roll.non-gm .indicator-area::before {
+    content: "???";
+    font-weight: bold;
+    color: gray;
+}
+
+.dc-update-button {
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.dc-update-button:hover {
+    background-color: #45a049;
+}
+
+.skill-dc-text {
+    font-size: 1em;
 }
