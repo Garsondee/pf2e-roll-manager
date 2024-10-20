@@ -655,7 +655,7 @@ function updateCharacterSelectionGrid() {
 }
 
 function buildCharacterVisibilityDialog() {
-    const playerCharacters = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character");
+    const playerCharacters = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character" && game.actors.party.members.includes(actor));
     const hiddenCharacters = JSON.parse(localStorage.getItem('hiddenCharacters')) || [];
 
     const content = `
@@ -954,7 +954,7 @@ async function createActionDropdown({
     }
 
     // Determine the default DC based on the level of the selected actors
-    const selectedActors = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character");
+    const selectedActors = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character" && game.actors.party.members.includes(actor));
     const highestLevel = Math.max(...selectedActors.map(actor => actor.system.details.level.value));
     defaultDC = calculateDefaultDC(highestLevel);
     console.log(`createActionDropdown: Calculated default DC based on highest level (${highestLevel}): ${defaultDC}`);
@@ -989,7 +989,7 @@ async function createActionDropdown({
     }, {name: 'Reflex Save', slug: 'reflex'}, {name: 'Will Save', slug: 'will'}], 'save:');
 
     // Handle recall knowledge skills
-    const recallKnowledgeSkills = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character")
+    const recallKnowledgeSkills = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character" && game.actors.party.members.includes(actor))
         .flatMap(actor => {
             const recallSkills = getRecallKnowledgeSkills(actor); // Assuming this returns an object
             if (!recallSkills) {
@@ -2091,7 +2091,7 @@ function buildSkillButtonsHtml(skills, prefix = '') {
  * @returns {string} - The generated HTML string containing character selection buttons, excluding hidden characters.
  */
 function buildCharacterSelectionHtml() {
-    const playerCharacters = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character");
+    const playerCharacters = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character" && game.actors.party.members.includes(actor));
     const hiddenCharacters = JSON.parse(localStorage.getItem('hiddenCharacters')) || [];
     console.log(`buildCharacterSelectionHtml: Building character selection HTML. Total characters: ${playerCharacters.length}, Hidden: ${hiddenCharacters.length}`);
     return `
