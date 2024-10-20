@@ -625,6 +625,7 @@ function attachCharacterSelectionListeners(container) {
  * @returns {Promise<void>}
  */
 function savePersistedSelections() {
+    if (!game.user.isGM) return;
     const selectedIdsArray = Array.from(selectedCharacterIds);
     game.settings.set("pf2e-roll-manager", "persistedSelectedCharacters", selectedIdsArray)
         .then(() => {
