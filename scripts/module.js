@@ -249,7 +249,7 @@ function registerSocketListeners(socket) {
         console.log(`[${MODULE_NAMESPACE}] Received 'generateCharacterRollBoxes' event with data:`, data);
         try {
             const {selectedCharacters, skillsToRoll, dc, isBlindGM, skillDCs} = data;
-            const actors = selectedCharacters.map((id) => game.actors.get(id)).filter(actor => actor !== null);
+            const actors = selectedCharacters.map((id) => game.actors.get(id)).filter(actor => actor !== null && actor.isOwner);
             if (actors.length > 0) {
                 if (!game.user.isGM) {
                     // Only non-GMs generate boxes
@@ -625,6 +625,7 @@ function attachCharacterSelectionListeners(container) {
  * @returns {Promise<void>}
  */
 function savePersistedSelections() {
+    if (!game.user.isGM) return;
     const selectedIdsArray = Array.from(selectedCharacterIds);
     game.settings.set("pf2e-roll-manager", "persistedSelectedCharacters", selectedIdsArray)
         .then(() => {
@@ -654,7 +655,7 @@ function updateCharacterSelectionGrid() {
 }
 
 function buildCharacterVisibilityDialog() {
-    const playerCharacters = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character");
+    const playerCharacters = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character" && game.actors.party.members.includes(actor));
     const hiddenCharacters = JSON.parse(localStorage.getItem('hiddenCharacters')) || [];
 
     const content = `
@@ -953,7 +954,7 @@ async function createActionDropdown({
     }
 
     // Determine the default DC based on the level of the selected actors
-    const selectedActors = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character");
+    const selectedActors = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character" && game.actors.party.members.includes(actor));
     const highestLevel = Math.max(...selectedActors.map(actor => actor.system.details.level.value));
     defaultDC = calculateDefaultDC(highestLevel);
     console.log(`createActionDropdown: Calculated default DC based on highest level (${highestLevel}): ${defaultDC}`);
@@ -988,7 +989,7 @@ async function createActionDropdown({
     }, {name: 'Reflex Save', slug: 'reflex'}, {name: 'Will Save', slug: 'will'}], 'save:');
 
     // Handle recall knowledge skills
-    const recallKnowledgeSkills = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character")
+    const recallKnowledgeSkills = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character" && game.actors.party.members.includes(actor))
         .flatMap(actor => {
             const recallSkills = getRecallKnowledgeSkills(actor); // Assuming this returns an object
             if (!recallSkills) {
@@ -1236,14 +1237,6 @@ function saveFoundrySettings() {
         type: Number,
         default: 6000
     });
-    game.settings.register("pf2e-roll-manager", "showDCForRoll", {
-        name: "Show DC for Rolls",
-        hint: "Whether or not the DC should be displayed.",
-        scope: "world",
-        config: true,
-        type: Boolean,
-        default: true
-    });
 
     // **New Setting for Auto-Close**
     game.settings.register("pf2e-roll-manager", "autoCloseRollInterface", {
@@ -1393,11 +1386,8 @@ function createCharacterBox(actor, skillsToRoll, dc, isBlindGM, index, skillDCsF
     const skillSelect = createSkillSelect(actor, skillsToRoll, skills, saves, otherAttributes);
     box.appendChild(skillSelect);
 
-    // Fetch the 'showDCForRoll' setting
-    const showDCForRoll = game.settings.get('pf2e-roll-manager', 'showDCForRoll');
-
     // Determine if DCs should be displayed
-    const shouldShowDCs = game.user.isGM || showDCForRoll;
+    const shouldShowDCs = game.user.isGM || game.pf2e.settings.metagame.dcs;
 
     // Create DC Inputs
     skillsToRoll.forEach(skillName => {
@@ -1921,7 +1911,7 @@ async function createHeadingWithDC(skillsToRoll, dc, isBlindGM) {
         formattedSkills = 'Unknown Skills';
     }
 
-    const showDCForRoll = await game.settings.get('pf2e-roll-manager', 'showDCForRoll') && !isBlindGM;
+    const showDCForRoll = game.pf2e.settings.metagame.dcs && !isBlindGM;
     const heading = document.createElement('h1');
     heading.textContent = showDCForRoll ? `The GM would like you to attempt a roll: ${formattedSkills} - DC: ${dc}` : `The GM would like you to attempt a roll: ${formattedSkills}`;
     heading.style.color = 'white';
@@ -2090,7 +2080,7 @@ function buildSkillButtonsHtml(skills, prefix = '') {
  * @returns {string} - The generated HTML string containing character selection buttons, excluding hidden characters.
  */
 function buildCharacterSelectionHtml() {
-    const playerCharacters = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character");
+    const playerCharacters = game.actors.filter(actor => actor.hasPlayerOwner && actor.type === "character" && game.actors.party.members.includes(actor));
     const hiddenCharacters = JSON.parse(localStorage.getItem('hiddenCharacters')) || [];
     console.log(`buildCharacterSelectionHtml: Building character selection HTML. Total characters: ${playerCharacters.length}, Hidden: ${hiddenCharacters.length}`);
     return `
