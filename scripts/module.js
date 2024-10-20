@@ -249,7 +249,7 @@ function registerSocketListeners(socket) {
         console.log(`[${MODULE_NAMESPACE}] Received 'generateCharacterRollBoxes' event with data:`, data);
         try {
             const {selectedCharacters, skillsToRoll, dc, isBlindGM, skillDCs} = data;
-            const actors = selectedCharacters.map((id) => game.actors.get(id)).filter(actor => actor !== null);
+            const actors = selectedCharacters.map((id) => game.actors.get(id)).filter(actor => actor !== null && actor.isOwner);
             if (actors.length > 0) {
                 if (!game.user.isGM) {
                     // Only non-GMs generate boxes
