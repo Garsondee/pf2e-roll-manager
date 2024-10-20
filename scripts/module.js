@@ -1237,14 +1237,6 @@ function saveFoundrySettings() {
         type: Number,
         default: 6000
     });
-    game.settings.register("pf2e-roll-manager", "showDCForRoll", {
-        name: "Show DC for Rolls",
-        hint: "Whether or not the DC should be displayed.",
-        scope: "world",
-        config: true,
-        type: Boolean,
-        default: true
-    });
 
     // **New Setting for Auto-Close**
     game.settings.register("pf2e-roll-manager", "autoCloseRollInterface", {
@@ -1394,11 +1386,8 @@ function createCharacterBox(actor, skillsToRoll, dc, isBlindGM, index, skillDCsF
     const skillSelect = createSkillSelect(actor, skillsToRoll, skills, saves, otherAttributes);
     box.appendChild(skillSelect);
 
-    // Fetch the 'showDCForRoll' setting
-    const showDCForRoll = game.settings.get('pf2e-roll-manager', 'showDCForRoll');
-
     // Determine if DCs should be displayed
-    const shouldShowDCs = game.user.isGM || showDCForRoll;
+    const shouldShowDCs = game.user.isGM || game.pf2e.settings.metagame.dcs;
 
     // Create DC Inputs
     skillsToRoll.forEach(skillName => {
@@ -1922,7 +1911,7 @@ async function createHeadingWithDC(skillsToRoll, dc, isBlindGM) {
         formattedSkills = 'Unknown Skills';
     }
 
-    const showDCForRoll = await game.settings.get('pf2e-roll-manager', 'showDCForRoll') && !isBlindGM;
+    const showDCForRoll = game.pf2e.settings.metagame.dcs && !isBlindGM;
     const heading = document.createElement('h1');
     heading.textContent = showDCForRoll ? `The GM would like you to attempt a roll: ${formattedSkills} - DC: ${dc}` : `The GM would like you to attempt a roll: ${formattedSkills}`;
     heading.style.color = 'white';
